@@ -1,0 +1,56 @@
+
+Matlab: fonction
+
+
+I=imread('lena.jpg');
+I=I(1:512,1:512);
+figure,imshow(I);
+title('Original Image');
+
+CM=cornermetric(I);
+CM_adjusted = imadjust(CM);
+figure,imshow(CM_adjusted);
+title('Corner Metric');
+
+CM=cornermetric(I,'Harris');
+CM_adjusted = imadjust(CM);
+figure,imshow(CM_adjusted);
+title('Corner Metric Harris');
+
+
+CM=cornermetric(I,'MinimumEigenvalue');
+CM_adjusted = imadjust(CM);
+figure,imshow(CM_adjusted);
+title('Corner Metric MinimumEigenvalue');
+
+
+
+
+
+I=imread('lena.jpg');
+I=I(1:512,1:512);
+subplot(1,3,1);
+imshow(I);
+title('Original Image');
+
+CM=cornermetric(I,'Harris','FilterCoefficients',fspecial('gaussian',[5 1],1.5));
+CM_adjusted = imadjust(CM);
+subplot(1,3,2);
+imshow(CM_adjusted);
+title('Corner Metric FilterCoefficients');
+
+corner_peaks = imregionalmax(CM);
+corner_idx = find(corner_peaks == true);
+[r g b] = deal(I);
+r(corner_idx) = 255;
+g(corner_idx) = 255;
+b(corner_idx) = 0;
+RGB = cat(3,r,g,b);
+subplot(1,3,3);
+imshow(RGB);
+title('Corner Points');
+
+
+
+
+

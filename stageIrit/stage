@@ -1,0 +1,54 @@
+Stage 
+Mise en correspondance de points d'intérêt dans des séries temporelles d'images issues d'observatoires photographiques du paysage
+
+lecture de "transformations locales":
+
+decouverte du lissage conservateur
+
+lecture de "detection et mise en correspondance de points d'intérêts":
+
+p.4 pas tout compris
+p.10 formule? parametre t?
+->p.13:detecteur de moravec, difficultés
+
+tuto OpenCV:
+http://docs.opencv.org/modules/core/doc/intro.html
+
+recherche sur propagation de germes
+
+lecture du chapitre 3 du rapport de Bérengère:
+
+$3.1.1
+faute orthographe (quels outils)
+p.25 $3.2 pratiquée
+
+
+
+
+
+
+piste:
+comparer des superpixels?
+Utiliser les informations fournies par les superpixels?
+(ressemble au bucketting)
+
+
+faire:
+
+
+g++ DisplayImage.cpp `pkg-config --cflags --libs opencv`
+pour avoir le a.out
+
+these de Guillaume GALES longue et dure à comprendre
+
+fonction 'corner' non présente sur cette version de matlab
+(7.9.0.529 (R2009b))
+
+
+
+
+
+
+
+
+
