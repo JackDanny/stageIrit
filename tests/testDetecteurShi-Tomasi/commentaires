@@ -1,0 +1,30 @@
+On utilise la fonction goodFeaturesToTrack
+elle trouve les meilleurs "coins" dans une image. Elle peut utiliser la fonction cornerHarris ou cornerMinEigenVal.
+C'est donc à la fois un detecteurs et un descripteur de p.i?
+
+
+void goodFeaturesToTrack(InputArray image, OutputArray corners, int maxCorners, double qualityLevel, double minDistance, InputArray mask=noArray(), int blockSize=3, bool useHarrisDetector=false, double k=0.04 )
+
+http://docs.opencv.org/modules/imgproc/doc/feature_detection.html?highlight=goodfeaturestotrack#goodfeaturestotrack
+
+
+1.la fonction calcule la mesure de la qualité de coins(poi) pour chaque pixel de l'image source en utilisant cornerMinEigenVal() ou cornerHarris()
+
+2.la fonction effectue un suppression non maximal (on retient le maximum local dans un voisinage 3*3)
+
+3.les pois dont le minimum de la valeur de eigen est plus faible que un certain seuil sont rejetés
+
+4.les pois retenus sont triés par leur qualité de mesure dans l'ordre décroissant
+
+5.la fonction rejette les coins pour lesquels il y a un coins meilleur à une distance inférieur à maxdistance
+
+
+1.Function calculates the corner quality measure at every source image pixel using the cornerMinEigenVal() or cornerHarris() .
+
+2.Function performs a non-maximum suppression (the local maximums in 3 x 3 neighborhood are retained).
+
+3.The corners with the minimal eigenvalue less than qualityLevel-max_{x,y} qualityMeasureMap(x,y) are rejected.
+
+4.The remaining corners are sorted by the quality measure in the descending order.
+
+5.Function throws away each corner for which there is a stronger corner at a distance less than maxDistance.

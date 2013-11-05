@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/mpi.dir/mpi.cpp.o  -o mpi -rdynamic -L/usr/local/lib -lcxcore -lcv -lml -lhighgui -lcvaux -Wl,-rpath,/usr/local/lib 

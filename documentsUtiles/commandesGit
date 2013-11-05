@@ -1,0 +1,11 @@
+faire
+
+git pull origine master
+
+modifs
+
+git add -A
+git commit -m "commit blabla"
+git push origin master
+
+
