@@ -56,11 +56,13 @@ nth_element(matches.begin(),    // initial position
           matches.begin()+24, // position of the sorted element
           matches.end());     // end position
       // remove all elements after the 25th
+      cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';  
+
       matches.erase(matches.begin()+176, matches.end());
       //keypoints1.erase(keypoints1.begin(), keypoints1.end());
       //keypoints2.erase(keypoints2.begin(), keypoints2.end());
       //matches.erase(matches.begin(), matches.begin()+1600);
-cout << matches.size();
+
 Mat imageMatches;
 Mat matchesMask;
 drawMatches(
