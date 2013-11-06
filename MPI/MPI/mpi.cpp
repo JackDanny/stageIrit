@@ -9,7 +9,7 @@ g++ mpi.cpp `pkg-config --cflags --libs opencv`
 #include "opencv2/legacy/legacy.hpp"
 */
 using namespace cv;
-
+using namespace std;
 
 
 int main( int argc, char** argv )
@@ -69,18 +69,20 @@ matcher.match(descriptors1,descriptors2, matches);
           matches.begin()+24, // position of the sorted element
           matches.end());     // end position
       // remove all elements after the 25th
-      //matches.erase(matches.begin()+25, matches.end());
-      
+     // matches.erase(matches.begin()+50, matches.end());
+cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';      
 cv::Mat imageMatches;
 cv::drawMatches(
   image1,keypoints1, // 1st image and its keypoints
   image2,keypoints2, // 2nd image and its keypoints
   matches,            // the matches
   imageMatches,      // the image produced
-  cv::Scalar(255,255,255)); // color of the lines
+  Scalar::all(-1),   // color of the lines
+  Scalar(255,255,255) //color of the keypoints
+); // color of the lines
 
- namedWindow( "Matches", CV_WINDOW_AUTOSIZE );
-  imshow( "Matches", imageMatches );
+ namedWindow( "Matches SURF", CV_WINDOW_AUTOSIZE );
+  imshow( "Matches SURF", imageMatches );
     cv::imwrite("resultat.png", imageMatches);   
   
 
