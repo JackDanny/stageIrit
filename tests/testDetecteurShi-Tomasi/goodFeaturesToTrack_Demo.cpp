@@ -33,7 +33,7 @@ int main( int argc, char** argv )
 {
 
 	if( argc != 3 ){
-	printf( "mettre Y pour utiliser Harris, N pour utiliser cornermineigen\n" );
+	printf( "mettre Y en 2eme parametre pour utiliser Harris, N pour utiliser cornermineigen\n" );
       return 1;	
 
 	}	
