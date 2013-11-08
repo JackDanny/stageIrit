@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <iostream>
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+//#include "opencv2/nonfree/features2d.hpp"
+#include <opencv2/legacy/legacy.hpp>
+
 using namespace cv;
 using namespace std;
 
@@ -47,7 +54,8 @@ const char* source_window = "Source image";
   siftDesc.compute(image2,keypoints2,descriptors2);
   
    // Construction of the matcher
-BruteForceMatcher<L2<float> > matcher;
+FBMatcher matcher(NORM_L2,true);
+
 // Match the two image descriptors
 vector<DMatch> matches;
 matcher.match(descriptors1,descriptors2, matches);
@@ -56,9 +64,7 @@ nth_element(matches.begin(),    // initial position
           matches.begin()+24, // position of the sorted element
           matches.end());     // end position
       // remove all elements after the 25th
-      cout << '\n' << "nombre de correspondances:" << matches.size() << '\n'; 
-
- 
+      cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';  
 
       matches.erase(matches.begin()+176, matches.end());
       //keypoints1.erase(keypoints1.begin(), keypoints1.end());
