@@ -39,12 +39,12 @@ const char* source_window = "Source image";
 
     int cols=image1.cols;
     int rows=image1.rows;
-
+   //   cout<<"\ntaille de la matrice:" <<image1.size();
   //  cout<<"\ntype de la matrice: \n" << image1.type();
   //  cout<<"\nflags" << image1.flags;
   //  cout<<"\ndims" << image1.dims;
-  //  cout<<"\nrows" << image1.rows;
-  //  cout<<"\ncols" << image1.cols;
+    cout<<"\nrows" << image1.rows;
+    cout<<"\ncols" << image1.cols;
   //  Point pt = Point(1,2);
     
   //  cout<<"\nnombre de chanels: " << image1.channels();
@@ -68,6 +68,8 @@ const char* source_window = "Source image";
  /// vector of keypoints 
   vector<KeyPoint> keypoints1,keypoints2;
 
+
+
 ///Construct the SURF feature detector object
   SiftFeatureDetector sift;
 
@@ -79,9 +81,29 @@ const char* source_window = "Source image";
   namedWindow( "Image 2", CV_WINDOW_AUTOSIZE );
   imshow( "Image 2", image2 );
   //afficher les coordonées des points des keypoints
-	for(int i=0;i<keypoints1.size();i++){
+	/*for(int i=0;i<keypoints1.size();i++){
+        cout<<"\n\nkeypoints number" << i <<"\n";
 	cout<<"\nkeypoints1" <<  keypoints1[i].pt; 
-	}
+  	cout<<"\nkeypoints1x " <<  keypoints1[i].pt.x; 
+	cout<<"\nkeypoints1y " <<  keypoints1[i].pt.y; 
+         
+	}*/
+
+
+  /*Mat imcopy;
+  image1.copyTo(imcopy);
+  for(int i=0;i<keypoints1.size();i++){
+     imcopy.at<cv::Vec3b>(keypoints1[i].pt.y,keypoints1[i].pt.x)[0]=0;
+     imcopy.at<cv::Vec3b>(keypoints1[i].pt.y,keypoints1[i].pt.x)[1]=0;
+     imcopy.at<cv::Vec3b>(keypoints1[i].pt.y,keypoints1[i].pt.x)[2]=255;
+  }
+  namedWindow( "Image copy", CV_WINDOW_AUTOSIZE );
+  imshow( "Image copy",  imcopy );
+  */
+
+ 
+  cout << "\ntaille du vecteur de keypoints: " << keypoints1.size(); 
+
   
   SiftDescriptorExtractor siftDesc;
   
@@ -103,25 +125,42 @@ nth_element(matches.begin(),    // initial position
 	//display the element attributs
 	//cout<< "\nmatches  " <<  matches;
 	
-	/*afficher les matches
+	//afficher les matches
 	for(int i=0;i<matches.size();i++){
-		cout<< "\n\npoint num " <<  i;
-
-		
+		cout<< "\n\npoint num " <<  i;		
 		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
 		cout<< "\nqueryIdx   " <<  matches[i].queryIdx;
 		cout<< "\ntrainIdx   " <<  matches[i].trainIdx;
+		cout<< "\ndistance   " <<  matches[i].distance;
+                
+/*
+		while(matches[i].distance <350  && i<matches.size()){
+			cout << "\ni= " << i;
+			matches.erase(matches.begin()+i, matches.begin()+i+1);
+		}
+                */
+                        
 		
 
 
 
-	}	
-	*/
+	}
+for(int i=0;i<matches.size();i++){
+		cout<< "\n\npoint num " <<  i;		
+		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
+		cout<< "\nqueryIdx   " <<  matches[i].queryIdx;
+		cout<< "\ntrainIdx   " <<  matches[i].trainIdx;
+		cout<< "\ndistance   " <<  matches[i].distance;
+}	
+
+
+	
 
 
 
       cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';  
-
+	
+      
       //matches.erase(matches.begin(), matches.end());
       //keypoints1.erase(keypoints1.begin(), keypoints1.end());
       //keypoints2.erase(keypoints2.begin(), keypoints2.end());
