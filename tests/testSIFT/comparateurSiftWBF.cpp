@@ -18,11 +18,17 @@ int main(int argc,char** argv){
 
 Mat image1,image2;
 
+
+
+
+
 const char* source_window = "Source image";
 
  /// Load images
  image1 = imread( argv[1], 1 );
  image2 = imread( argv[2], 1 );
+
+
 
   if( argc != 3 || !image1.data || !image2.data)
     {
@@ -30,14 +36,31 @@ const char* source_window = "Source image";
       return 1;
     }
 
-    cout<<"\ntype de la matrice: \n" << image1.type();
-    cout<<"\nflags" << image1.flags;
-    cout<<"\ndims" << image1.dims;
-    cout<<"\nrows" << image1.rows;
-    cout<<"\ncols" << image1.cols;
-    Point pt = Point(1,2);
+
+    int cols=image1.cols;
+    int rows=image1.rows;
+
+  //  cout<<"\ntype de la matrice: \n" << image1.type();
+  //  cout<<"\nflags" << image1.flags;
+  //  cout<<"\ndims" << image1.dims;
+  //  cout<<"\nrows" << image1.rows;
+  //  cout<<"\ncols" << image1.cols;
+  //  Point pt = Point(1,2);
     
-    cout<< "\npoints 1 1 " << image1.at<uchar>(0,0);
+  //  cout<<"\nnombre de chanels: " << image1.channels();
+
+  //  cout<< "\npoints 1 1 " << (int)image1.at<cv::Vec3b>(0,1)[1];
+    
+    /*
+    for(int i=0;i<cols;i++){
+	for(int j=0;j<rows;j++){
+		image1.at<cv::Vec3b>(i,j)[0]=0;
+		image1.at<cv::Vec3b>(i,j)[1]=0;
+		image1.at<cv::Vec3b>(i,j)[2]=0;
+	}
+    }
+    */
+
     cout<< "\nmais que se passe-t'il?";
 
  // cout<<"\nimage1" <<  image1; 
@@ -55,11 +78,11 @@ const char* source_window = "Source image";
   imshow( "Image 1", image1 );
   namedWindow( "Image 2", CV_WINDOW_AUTOSIZE );
   imshow( "Image 2", image2 );
-  /*afficher les coordonées des points des keypoints
+  //afficher les coordonées des points des keypoints
 	for(int i=0;i<keypoints1.size();i++){
 	cout<<"\nkeypoints1" <<  keypoints1[i].pt; 
 	}
-  */
+  
   SiftDescriptorExtractor siftDesc;
   
   Mat descriptors1,descriptors2;
