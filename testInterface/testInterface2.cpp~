@@ -14,10 +14,27 @@ using namespace cv;
 using namespace std;
 
 
-int main(int argc,char** argv){
 
+
+const char* transparency_window = "transparence";
+
+int thresh = 0;
+int max_thresh = 100;
+int cols;
+int rows;
+
+// Match the two image descriptors
+vector<DMatch> matches;
+
+/// vector of keypoints 
+  vector<KeyPoint> keypoints1,keypoints2;
+
+
+/// Function header
+void interface( int argc, void* );
 Mat image1,image2;
 
+int main(int argc,char** argv){
 
 
 
@@ -45,7 +62,6 @@ const char* source_window = "Source image";
   //  cout<<"\ndims" << image1.dims;
     cout<<"\nrows" << image1.rows;
     cout<<"\ncols" << image1.cols;
-  //  Point pt = Point(1,2);
     
   //  cout<<"\nnombre de chanels: " << image1.channels();
 
@@ -61,13 +77,9 @@ const char* source_window = "Source image";
     }
     */
 
-    cout<< "\nmais que se passe-t'il?";
-
  // cout<<"\nimage1" <<  image1; 
 
- /// vector of keypoints 
-  vector<KeyPoint> keypoints1,keypoints2;
-
+ 
 
 
 ///Construct the SURF feature detector object
@@ -114,8 +126,6 @@ const char* source_window = "Source image";
    // Construction of the matcher
 BruteForceMatcher<L2<float> > matcher;
 
-// Match the two image descriptors
-vector<DMatch> matches;
 matcher.match(descriptors1,descriptors2, matches);
 
 nth_element(matches.begin(),    // initial position
@@ -137,12 +147,12 @@ nth_element(matches.begin(),    // initial position
 		cout<< "\ndistance   " <<  matches[i].distance;
 */
                 
-
+/*
 		while(matches[i].distance >100  && i<matches.size()){
 			cout << "\ni= " << i;
 			matches.erase(matches.begin()+i, matches.begin()+i+1);
 		}
-                
+           */     
                 
 	}
         
@@ -160,8 +170,14 @@ cout<< "\nOn relie le point de coordonee x1= " << keypoints1[matches[i].queryIdx
 
 
       cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';  
-	
+/// Create a window and a trackbar
+  namedWindow(transparency_window, WINDOW_AUTOSIZE );
+  createTrackbar( "Threshold: ", transparency_window, &thresh, max_thresh, interface );	
+  interface( 0, 0 );
+
+
       
+
       //matches.erase(matches.begin(), matches.end());
       //keypoints1.erase(keypoints1.begin(), keypoints1.end());
       //keypoints2.erase(keypoints2.begin(), keypoints2.end());
@@ -169,36 +185,53 @@ cout<< "\nOn relie le point de coordonee x1= " << keypoints1[matches[i].queryIdx
 
 
 
-Mat imageMatches;
-Mat matchesMask;
-drawMatches(
-  image1,keypoints1, // 1st image and its keypoints
-  image2,keypoints2, // 2nd image and its keypoints
-  matches,            // the matches
-  imageMatches,      // the image produced
-  Scalar::all(-1),   // color of the lines
-  Scalar(255,255,255) //color of the keypoints
-  );
-  namedWindow( "Matches SIFT", CV_WINDOW_AUTOSIZE );
-  imshow( "Matches SIFT", imageMatches );
-  imwrite("resultat.png", imageMatches);
-
-  /*
-  drawKeypoints(src,keypoints1,dst,cv::Scalar(255,255,255));
-  cout << '\n' << keypoints1.size() << '\n';
-  imshow( "Image 1", dst );
-  
-  imwrite("resultat.png", dst);
-  */
-
-
   waitKey(0);
   
   return 0;
 
+}
 
 
 
+
+void interface( int, void* )
+{
+
+  Mat dst;
+  image1.copyTo(dst);
+
+  ///on adapte l'importance des pixels de chaque image selon la valeur du trackbar
+  for(int i=0;i<rows;i++){
+     for(int j=0;j<cols;j++){
+
+       dst.at<cv::Vec3b>(i,j)[0]= (float)(image2.at<cv::Vec3b>(i,j)[0])*(float)(thresh/100.) +(float)( image1.at<cv::Vec3b>(i,j)[0])*(float)((100.-thresh)/100.)  ;
+       dst.at<cv::Vec3b>(i,j)[1]=(float)(image2.at<cv::Vec3b>(i,j)[1])*(float)(thresh/100.) + (float)(image1.at<cv::Vec3b>(i,j)[1])*(float)((100.-thresh)/100.)  ;
+       dst.at<cv::Vec3b>(i,j)[2]=(float)(image2.at<cv::Vec3b>(i,j)[2])*(float)(thresh/100.) + (float)(image1.at<cv::Vec3b>(i,j)[2])*(float)((100.-thresh)/100.)  ;
+
+  
+     }
+  }
+  //line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+  float kp1x;
+  float kp1y;
+  float kp2x;
+  float kp2y;
+  
+
+  for(int i=0;i<matches.size();i++){
+    kp1x=keypoints1[matches[i].queryIdx].pt.x;
+    kp1y=keypoints1[matches[i].queryIdx].pt.y;
+    kp2x=keypoints2[matches[i].trainIdx].pt.x;
+    kp2y=keypoints2[matches[i].trainIdx].pt.y;
+    Point pt1=Point(kp1x,kp1y);
+    Point pt2=Point(kp2x,kp2y);
+
+    line(dst, pt1, pt2, Scalar(255,255,255));
+
+  }
+  
+
+  
 
 
 

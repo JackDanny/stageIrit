@@ -126,34 +126,35 @@ nth_element(matches.begin(),    // initial position
 	//cout<< "\nmatches  " <<  matches;
 	
 	//afficher les matches
+
+
 	for(int i=0;i<matches.size();i++){
-		cout<< "\n\npoint num " <<  i;		
+//affichage des attributs
+/*		cout<< "\n\npoint num " <<  i;		
 		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
 		cout<< "\nqueryIdx   " <<  matches[i].queryIdx;
 		cout<< "\ntrainIdx   " <<  matches[i].trainIdx;
 		cout<< "\ndistance   " <<  matches[i].distance;
+*/
                 
 /*
-		while(matches[i].distance <350  && i<matches.size()){
+		while(matches[i].distance >100  && i<matches.size()){
 			cout << "\ni= " << i;
 			matches.erase(matches.begin()+i, matches.begin()+i+1);
 		}
-                */
-                        
-		
-
-
-
+           */     
+                
 	}
+        
+
 for(int i=0;i<matches.size();i++){
-		cout<< "\n\npoint num " <<  i;		
-		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
-		cout<< "\nqueryIdx   " <<  matches[i].queryIdx;
-		cout<< "\ntrainIdx   " <<  matches[i].trainIdx;
-		cout<< "\ndistance   " <<  matches[i].distance;
-}	
+cout<< "\nOn relie le point de coordonee x1= " << keypoints1[matches[i].queryIdx].pt.x;
+		cout<< "\ny1= " << keypoints1[matches[i].queryIdx].pt.y;
 
+		cout<< "\nAvec le point de coordonne x2= " << keypoints2[matches[i].trainIdx].pt.x;
+ 		cout<< "\ny2= " << keypoints2[matches[i].trainIdx].pt.y;
 
+}
 	
 
 
