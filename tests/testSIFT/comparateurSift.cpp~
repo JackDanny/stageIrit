@@ -56,11 +56,19 @@ nth_element(matches.begin(),    // initial position
           matches.begin()+24, // position of the sorted element
           matches.end());     // end position
       // remove all elements after the 25th
-      cout << '\n' << "nombre de correspondances:" << matches.size() << '\n'; 
+      cout << '\n' << "nombre de correspondances:" << matches.size() << '\n';  
+      matches.erase(matches.begin()+100, matches.end());
 
- 
-
-      matches.erase(matches.begin()+176, matches.end());
+ /*for(int i=0;i<matches.size();i++){
+                
+		while(matches[i].distance >100  && i<matches.size()){
+			cout << "\ni= " << i;
+			matches.erase(matches.begin()+i, matches.begin()+i+1);
+		}
+                
+                
+	}*/
+      //matches.erase(matches.begin()+176, matches.end());
       //keypoints1.erase(keypoints1.begin(), keypoints1.end());
       //keypoints2.erase(keypoints2.begin(), keypoints2.end());
       //matches.erase(matches.begin(), matches.begin()+1600);

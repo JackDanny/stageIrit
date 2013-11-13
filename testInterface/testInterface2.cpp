@@ -27,7 +27,7 @@ int rows;
 vector<DMatch> matches;
 
 /// vector of keypoints 
-  vector<KeyPoint> keypoints1,keypoints2;
+vector<KeyPoint> keypoints1,keypoints2;
 
 
 /// Function header
@@ -88,10 +88,10 @@ const char* source_window = "Source image";
   sift.detect(image1,keypoints1);
   sift.detect(image2,keypoints2);
 
-  namedWindow( "Image 1", CV_WINDOW_AUTOSIZE );
-  imshow( "Image 1", image1 );
-  namedWindow( "Image 2", CV_WINDOW_AUTOSIZE );
-  imshow( "Image 2", image2 );
+  namedWindow( "Image1", WINDOW_AUTOSIZE );
+  imshow( "Image1", image1 );
+  namedWindow( "Image2", WINDOW_AUTOSIZE );
+  imshow( "Image2", image2 );
   //afficher les coordonées des points des keypoints
 	/*for(int i=0;i<keypoints1.size();i++){
         cout<<"\n\nkeypoints number" << i <<"\n";
@@ -201,7 +201,18 @@ void interface( int, void* )
   image1.copyTo(dst);
 
   ///on adapte l'importance des pixels de chaque image selon la valeur du trackbar
-  for(int i=0;i<rows;i++){
+  /*for(int i=0;i<rows;i++){
+     for(int j=0;j<cols;j++){
+
+       dst.at<cv::Vec3b>(i,j)[0]= (float)(image2.at<cv::Vec3b>(i,j)[0])*(float)(thresh/100.) +(float)( image1.at<cv::Vec3b>(i,j)[0])*(float)((100.-thresh)/100.)  ;
+       dst.at<cv::Vec3b>(i,j)[1]=(float)(image2.at<cv::Vec3b>(i,j)[1])*(float)(thresh/100.) + (float)(image1.at<cv::Vec3b>(i,j)[1])*(float)((100.-thresh)/100.)  ;
+       dst.at<cv::Vec3b>(i,j)[2]=(float)(image2.at<cv::Vec3b>(i,j)[2])*(float)(thresh/100.) + (float)(image1.at<cv::Vec3b>(i,j)[2])*(float)((100.-thresh)/100.)  ;
+
+  
+     }
+  }*/
+ cout<<"\nhouhou!!!";
+ for(int i=0;i<rows;i++){
      for(int j=0;j<cols;j++){
 
        dst.at<cv::Vec3b>(i,j)[0]= (float)(image2.at<cv::Vec3b>(i,j)[0])*(float)(thresh/100.) +(float)( image1.at<cv::Vec3b>(i,j)[0])*(float)((100.-thresh)/100.)  ;
@@ -211,13 +222,22 @@ void interface( int, void* )
   
      }
   }
-  //line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-  float kp1x;
-  float kp1y;
-  float kp2x;
-  float kp2y;
   
 
+
+  namedWindow(transparency_window, WINDOW_AUTOSIZE );
+  imshow( transparency_window, dst );
+
+
+
+
+  //line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+  /*float kp1x;
+  float kp1y;
+  float kp2x;
+  float kp2y;*/
+  
+  /*
   for(int i=0;i<matches.size();i++){
     kp1x=keypoints1[matches[i].queryIdx].pt.x;
     kp1y=keypoints1[matches[i].queryIdx].pt.y;
@@ -229,8 +249,8 @@ void interface( int, void* )
     line(dst, pt1, pt2, Scalar(255,255,255));
 
   }
-  
-
+  */
+ 
   
 
 
