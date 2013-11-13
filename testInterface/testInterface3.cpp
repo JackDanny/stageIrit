@@ -86,7 +86,7 @@ nth_element(matches.begin(),    // initial position
 	//cout<< "\nmatches  " <<  matches;
 
 
-   matches.erase(matches.begin()+100, matches.end());
+   //matches.erase(matches.begin()+100, matches.end());
 
    for(int i=0;i<matches.size();i++){
   //affichage des attributs
@@ -102,8 +102,16 @@ nth_element(matches.begin(),    // initial position
 			matches.erase(matches.begin()+i, matches.begin()+i+1);
 		}*/
                 
+
+
+
+
+
+
                 
 	}
+
+
 
 Mat imageMatches;
 Mat matchesMask;
@@ -115,6 +123,7 @@ drawMatches(
   Scalar::all(-1),   // color of the lines
   Scalar(255,255,255) //color of the keypoints
   );
+
   namedWindow( "Matches SIFT", CV_WINDOW_AUTOSIZE );
   imshow( "Matches SIFT", imageMatches );
   imwrite("resultat.png", imageMatches);
@@ -175,20 +184,58 @@ void interface( int, void* )
   
 
   for(int i=0;i<matches.size();i++){
+    
+    
     kp1x=keypoints1[matches[i].queryIdx].pt.x;
     kp1y=keypoints1[matches[i].queryIdx].pt.y;
     kp2x=keypoints2[matches[i].trainIdx].pt.x;
     kp2y=keypoints2[matches[i].trainIdx].pt.y;
     Point pt1=Point(kp1x,kp1y);
     Point pt2=Point(kp2x,kp2y);
-
+    /*
+    cout<<"\npoint number "<< i;
+    cout<<"\nx1 "<<kp1x;
+    cout<<"\ny1 "<<kp1y;
+    cout<<"\nx2 "<<kp2x;
+    cout<<"\ny2 "<<kp2y;
     float distance=pow((kp1x-kp2x),2)+((kp1y-kp2y),2);
-
-    //if(distance <3){
-
-    /*keypointsKeep1.push_back(keypoints1[matches[i].queryIdx]);
-    keypointsKeep2.push_back(keypoints2[matches[i].queryIdx]);*/
     
+    cout<<"\ndistance "<<distance;
+    */
+
+    float distance=pow((kp1x-kp2x),2)+pow((kp1y-kp2y),2);
+    /*pour selectioner ceux dont la distance est < 10 pixels 
+
+    while(distance>100 && i<matches.size()){
+	matches.erase(matches.begin()+i);
+        kp1x=keypoints1[matches[i].queryIdx].pt.x;
+        kp1y=keypoints1[matches[i].queryIdx].pt.y;
+        kp2x=keypoints2[matches[i].trainIdx].pt.x;
+        kp2y=keypoints2[matches[i].trainIdx].pt.y;
+        Point pt1=Point(kp1x,kp1y);
+        Point pt2=Point(kp2x,kp2y);
+        distance=pow((kp1x-kp2x),2)+pow((kp1y-kp2y),2);
+
+
+    }
+
+    */
+
+
+    
+    if(distance <100 && i<matches.size()){
+    keypointsKeep1.push_back(keypoints1[matches[i].queryIdx]);
+    keypointsKeep2.push_back(keypoints2[matches[i].queryIdx]);
+    
+    cout<<"\npoint number "<< i;
+    cout<<"\nx1 "<<kp1x;
+    cout<<"\ny1 "<<kp1y;
+    cout<<"\nx2 "<<kp2x;
+    cout<<"\ny2 "<<kp2y;
+    
+    cout<<"\ndistance "<<distance;
+
+
     kptx=kp1x*(100.-thresh)/100. + kp2x*(thresh/100.);
     kpty=kp1y*(100.-thresh)/100. + kp2y*(thresh/100.);
 
@@ -210,7 +257,7 @@ void interface( int, void* )
 
     circle( dst, ptkp1, 5,  Scalar(rouge,vert,bleu), 2, 8, 0 );
 
-    //}
+    }
  //   line(dst, ptkp1, pt2, Scalar(rouge,vert,bleu),2,8,0);
 
 
@@ -230,9 +277,6 @@ void interface( int, void* )
 //void drawKeypoints(const Mat& image, const vector<KeyPoint>& keypoints, Mat& outImage, const Scalar& color=Scalar::all(-1), int flags=DrawMatchesFlags::DEFAULT )
    
   // drawKeypoints(dst, keypointsKeep1, dst, Scalar::all(-1));
-
-  
-
 
 
   
