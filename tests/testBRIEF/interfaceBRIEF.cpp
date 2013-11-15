@@ -34,8 +34,10 @@ int max_thresh = 100;
 
 
 ///Construct the SIFT feature detector object
-  SiftFeatureDetector sift;
-  
+  //nrmlt les valeurs par defauts
+  //SiftFeatureDetector sift(0.04/3/2.0,10,4,3,0,-1);
+  //SiftFeatureDetector sift; //je crois que le descripteur s'adapte dans ce cas
+  SiftFeatureDetector sift(0.10,10);
  
 
 
@@ -62,55 +64,32 @@ int main( int, char** argv )
   namedWindow( "image2", WINDOW_AUTOSIZE );
   imshow( "image2",image2 );
 
+  
+
   sift.detect(image1,keypoints1);
   sift.detect(image2,keypoints2);
 
-  SiftDescriptorExtractor siftDesc;
+  BriefDescriptorExtractor briefDesc(64);
   
   Mat descriptors1,descriptors2;
-  siftDesc.compute(image1,keypoints1,descriptors1);
-  siftDesc.compute(image2,keypoints2,descriptors2);
+  briefDesc.compute(image1,keypoints1,descriptors1);
+  briefDesc.compute(image2,keypoints2,descriptors2);
   
   // Construction of the matcher
-  BruteForceMatcher<L2<float> > matcher;
+  //BruteForceMatcher< HammingLUT > matcher;
+  BruteForceMatcher<Hamming> matcher;
+//cout << "\n type= " << descriptors1.type();
+
+
+
 
   // Match the two image descriptors
-  
+
   matcher.match(descriptors1,descriptors2, matches);
 
 nth_element(matches.begin(),    // initial position
           matches.begin()+24, // position of the sorted element
           matches.end());     // end position
-      // remove all elements after the 25th
-	//display the element attributs
-	//cout<< "\nmatches  " <<  matches;
-
-
-   //matches.erase(matches.begin()+100, matches.end());
-
-   //for(int i=0;i<matches.size();i++){
-  //affichage des attributs
-  /*		cout<< "\n\npoint num " <<  i;		
-		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
-		cout<< "\nqueryIdx   " <<  matches[i].queryIdx;
-		cout<< "\ntrainIdx   " <<  matches[i].trainIdx;
-		cout<< "\ndistance   " <<  matches[i].distance;
-  */
-                
-	       /* while(matches[i].distance >200  && i<matches.size()){
-			cout << "\ni= " << i;
-			matches.erase(matches.begin()+i, matches.begin()+i+1);
-		}*/
-                
-
-
-
-
-
-
-                
-	//}
-
 
 
 Mat imageMatches;
@@ -124,8 +103,8 @@ drawMatches(
   Scalar(255,255,255) //color of the keypoints
   );
 
-  namedWindow( "Matches SIFT", CV_WINDOW_AUTOSIZE );
-  imshow( "Matches SIFT", imageMatches );
+  namedWindow( "Matches BRIEF", CV_WINDOW_AUTOSIZE );
+  imshow( "Matches BRIEF", imageMatches );
   imwrite("resultat.png", imageMatches);
 
 
@@ -192,16 +171,6 @@ void interface( int, void* )
     kp2y=keypoints2[matches[i].trainIdx].pt.y;
     Point pt1=Point(kp1x,kp1y);
     Point pt2=Point(kp2x,kp2y);
-    /*
-    cout<<"\npoint number "<< i;
-    cout<<"\nx1 "<<kp1x;
-    cout<<"\ny1 "<<kp1y;
-    cout<<"\nx2 "<<kp2x;
-    cout<<"\ny2 "<<kp2y;
-    float distance=pow((kp1x-kp2x),2)+((kp1y-kp2y),2);
-    
-    cout<<"\ndistance "<<distance;
-    */
 
     float distance=pow((kp1x-kp2x),2)+pow((kp1y-kp2y),2);
     /*pour selectioner ceux dont la distance est < 10 pixels 
@@ -223,7 +192,7 @@ void interface( int, void* )
 
 
     
-    //if(distance <100 && i<matches.size()){
+   /* if(distance <100 && i<matches.size()){
     keypointsKeep1.push_back(keypoints1[matches[i].queryIdx]);
     keypointsKeep2.push_back(keypoints2[matches[i].queryIdx]);
     
@@ -235,7 +204,7 @@ void interface( int, void* )
     
     cout<<"\ndistance "<<distance;
 
-
+    */
     kptx=kp1x*(100.-thresh)/100. + kp2x*(thresh/100.);
     kpty=kp1y*(100.-thresh)/100. + kp2y*(thresh/100.);
 
@@ -258,7 +227,6 @@ void interface( int, void* )
     circle( dst, ptkp1, 5,  Scalar(rouge,vert,bleu), 2, 8, 0 );
 
     //}
-    
  //   line(dst, ptkp1, pt2, Scalar(rouge,vert,bleu),2,8,0);
 
 

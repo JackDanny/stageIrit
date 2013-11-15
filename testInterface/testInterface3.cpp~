@@ -88,7 +88,7 @@ nth_element(matches.begin(),    // initial position
 
    //matches.erase(matches.begin()+100, matches.end());
 
-   for(int i=0;i<matches.size();i++){
+   //for(int i=0;i<matches.size();i++){
   //affichage des attributs
   /*		cout<< "\n\npoint num " <<  i;		
 		cout<< "\nimgIdx  " <<  matches[i].imgIdx ;	
@@ -109,7 +109,7 @@ nth_element(matches.begin(),    // initial position
 
 
                 
-	}
+	//}
 
 
 
@@ -204,6 +204,7 @@ void interface( int, void* )
     */
 
     float distance=pow((kp1x-kp2x),2)+pow((kp1y-kp2y),2);
+    /*pour selectioner ceux dont la distance est < 10 pixels 
 
     while(distance>100 && i<matches.size()){
 	matches.erase(matches.begin()+i);
@@ -218,7 +219,7 @@ void interface( int, void* )
 
     }
 
-
+    */
 
 
     
