@@ -9,6 +9,7 @@
  * Il faut configurer BriefDescriptorExtractor
  *
  * et Bruteforce
+ * configurer la distance correspondant aux voisins autour desquels on cherche
  */
 
 
