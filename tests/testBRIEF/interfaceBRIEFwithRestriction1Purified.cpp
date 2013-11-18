@@ -121,6 +121,16 @@ int main( int, char** argv )
       
 
     }
+    cout<<"\nk1 ";
+    cout<<"\nangle " << keypoints1[0].angle;
+    cout<<"\nclass_id " << keypoints1[0].class_id;
+    cout<<"\noctave " << keypoints1[0].octave ;
+    cout<<"\npt " << keypoints1[0].pt ;
+    cout<<"\nresponse " << keypoints1[0].response;
+    cout<<"\nsize " << keypoints1[0].size;
+
+
+
     //ici on ne matche qu'un keypoints de l'image1 avec tous les keypoints gardés de l'image 2
     matcher.match(descriptorAuxKp1,descriptorAuxKp2, matches);
     

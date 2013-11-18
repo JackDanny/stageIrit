@@ -14,17 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <iostream>
-#include <string>
-#include <vector>
-
-//#include <opencv2/core.hpp>
-//#include "opencv2/core/utility.hpp"
-//#include <opencv2/highgui.hpp>
-//#include <opencv2/features2d.hpp>
-//#include <opencv2/nonfree.hpp>
-
-
 using namespace cv;
 using namespace std;
 
@@ -38,7 +27,7 @@ const char* transparency_window = "transparence";
 int thresh = 0;
 int max_thresh = 100;
 
-/// variables for sift
+
 
   vector<KeyPoint> keypoints1,keypoints2;
   //vector<DMatch>  matches;
@@ -47,13 +36,7 @@ int max_thresh = 100;
   //vector<vector<DMatch> > matchesWithDist;
   vector<DMatch> matchesWithDist;
 
-///Construct the SIFT feature detector object
-  //nrmlt les valeurs par defauts
-  //SiftFeatureDetector sift(0.04/3/2.0,10,4,3,0,-1);
-  //SiftFeatureDetector sift; //je crois que le descripteur s'adapte dans ce cas
-  SiftFeatureDetector sift(0.10,10);
- 
-
+  MserFeatureDetector mser;
 
 
 /// Function header
@@ -80,24 +63,14 @@ int main( int, char** argv )
 
   
 
-  sift.detect(image1,keypoints1);
-  sift.detect(image2,keypoints2);
+  mser.detect(image1,keypoints1);
+  mser.detect(image2,keypoints2);
 
-  //DescriptorExtractor FreakDesc;
-
-  //FreakDesc.create("FREAK");
+  BriefDescriptorExtractor briefDesc(64);
   
-  //FREAK FreakDesc;
-
-  Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
-
-  //DescriptorExtractor* FreakDesc = new DescriptorExtractor("FREAK");
-
-  FreakDesc = DescriptorExtractor::create("FREAK");
-
   Mat descriptors1,descriptors2;
-  (&FreakDesc)->compute(image1,keypoints1,descriptors1);
-  (&FreakDesc)->compute(image2,keypoints2,descriptors2);
+  briefDesc.compute(image1,keypoints1,descriptors1);
+  briefDesc.compute(image2,keypoints2,descriptors2);
 
   
   

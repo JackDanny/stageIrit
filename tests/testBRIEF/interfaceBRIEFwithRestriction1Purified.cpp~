@@ -112,7 +112,7 @@ int main( int, char** argv )
       float distance=sqrt(pow((p1x-p2x),2)+pow((p1y-p2y),2));
       
 	//parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie du keypoints en cours, en l'occurence le ieme ici.
-      if(distance<3){
+      if(distance<4){
        
         descriptorAuxKp2.push_back(descriptors2.row(j));
         associateIdx.push_back(j);
@@ -121,6 +121,16 @@ int main( int, char** argv )
       
 
     }
+    cout<<"\nk1 ";
+    cout<<"\nangle ";
+    cout<<"\nclass_id ";
+    cout<<"\noctave ";
+    cout<<"\npt ";
+    cout<<"\nresponse ";
+    cout<<"\nsize ";
+
+
+
     //ici on ne matche qu'un keypoints de l'image1 avec tous les keypoints gardés de l'image 2
     matcher.match(descriptorAuxKp1,descriptorAuxKp2, matches);
     

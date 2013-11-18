@@ -10,9 +10,11 @@
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -21,6 +23,7 @@
 //#include <opencv2/highgui.hpp>
 //#include <opencv2/features2d.hpp>
 //#include <opencv2/nonfree.hpp>
+
 
 using namespace cv;
 using namespace std;
@@ -48,8 +51,8 @@ int max_thresh = 100;
   //nrmlt les valeurs par defauts
   //SiftFeatureDetector sift(0.04/3/2.0,10,4,3,0,-1);
   //SiftFeatureDetector sift; //je crois que le descripteur s'adapte dans ce cas
-  //SiftFeatureDetector sift(0.10,10);
-  SurfFeatureDetector detector(2000,4);
+  SiftFeatureDetector sift(0.10,10);
+ 
 
 
 
@@ -77,16 +80,24 @@ int main( int, char** argv )
 
   
 
-  detector.detect(image1,keypoints1);
-  detector.detect(image2,keypoints2);
- 
+  sift.detect(image1,keypoints1);
+  sift.detect(image2,keypoints2);
 
-  Freak extractor;
+  //DescriptorExtractor FreakDesc;
 
+  //FreakDesc.create("FREAK");
   
+  FREAK FreakDesc;
+
+  //Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
+
+  //DescriptorExtractor* FreakDesc = new DescriptorExtractor("FREAK");
+
+  FreakDesc = DescriptorExtractor::create("FREAK");
+
   Mat descriptors1,descriptors2;
-  extractor.compute(image1,keypoints1,descriptors1);
-  extractor.compute(image2,keypoints2,descriptors2);
+  (&FreakDesc)->compute(image1,keypoints1,descriptors1);
+  (&FreakDesc)->compute(image2,keypoints2,descriptors2);
 
   
   

@@ -1,3 +1,23 @@
+/**
+ * il faut configurer Harris avec
+ * int blockSize;
+ * int apertureSize;
+ * double k;
+ *
+ * et il faut mettre un size aux keypoints (e.g 100.0)
+ *
+ * Il faut configurer BriefDescriptorExtractor
+ *
+ * et Bruteforce
+ */
+
+
+
+
+
+
+
+
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
@@ -14,16 +34,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <iostream>
-#include <string>
-#include <vector>
-
-//#include <opencv2/core.hpp>
-//#include "opencv2/core/utility.hpp"
-//#include <opencv2/highgui.hpp>
-//#include <opencv2/features2d.hpp>
-//#include <opencv2/nonfree.hpp>
-
 
 using namespace cv;
 using namespace std;
@@ -34,6 +44,7 @@ int rows;
 int cols;
 
 const char* transparency_window = "transparence";
+const char* matches_window = "Harris+BRIEF+BF";
 
 int thresh = 0;
 int max_thresh = 100;
@@ -46,15 +57,6 @@ int max_thresh = 100;
   
   //vector<vector<DMatch> > matchesWithDist;
   vector<DMatch> matchesWithDist;
-
-///Construct the SIFT feature detector object
-  //nrmlt les valeurs par defauts
-  //SiftFeatureDetector sift(0.04/3/2.0,10,4,3,0,-1);
-  //SiftFeatureDetector sift; //je crois que le descripteur s'adapte dans ce cas
-  SiftFeatureDetector sift(0.10,10);
- 
-
-
 
 /// Function header
 void interface( int argc, void* );
@@ -78,32 +80,116 @@ int main( int, char** argv )
   namedWindow( "image2", WINDOW_AUTOSIZE );
   imshow( "image2",image2 );
 
+  Mat image1_gray;
+  Mat image2_gray;
+
+
+  /// Converts an image from one color space to another.
+  cvtColor( image1, image1_gray, COLOR_BGR2GRAY );
+  cvtColor( image2, image2_gray, COLOR_BGR2GRAY );
   
+  /// Detector parameters
+  int blockSize = 2;
+  int apertureSize = 3;
+  double k = 0.04;
 
-  sift.detect(image1,keypoints1);
-  sift.detect(image2,keypoints2);
+   /// Detecting corners
+  /*
+  void ocl::cornerHarris(const oclMat& src, oclMat& dst, int blockSize, int ksize, double k, int bordertype=cv::BORDER_DEFAULT)
 
-  //DescriptorExtractor FreakDesc;
+    src – Source image. Only CV_8UC1 and CV_32FC1 images are supported now.
+    dst – Destination image containing cornerness values. It has the same size as src and CV_32FC1 type.
+    blockSize – Neighborhood size
+    ksize – Aperture parameter for the Sobel operator
+    k – Harris detector free parameter
+    bordertype – Pixel extrapolation method. Only BORDER_REFLECT101, BORDER_REFLECT, BORDER_CONSTANT and BORDER_REPLICATE are supported now.
+*/
 
-  //FreakDesc.create("FREAK");
+  Mat image1dst;
+  Mat image2dst;
+
+  image1dst = Mat::zeros( image1.size(), CV_32FC1 );
+  image2dst = Mat::zeros( image2.size(), CV_32FC1 );
+
   
-  //FREAK FreakDesc;
+  cornerHarris( image1_gray, image1dst, blockSize, apertureSize, k, BORDER_DEFAULT );
+  cornerHarris( image2_gray, image2dst, blockSize, apertureSize, k, BORDER_DEFAULT );
 
-  Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
+  int threshHarris=100;
+  
+  /// Normalizing
+  /*
+    void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, InputArray mask=noArray() )
+    src – input array.
+    dst – output array of the same size as src .
+    alpha – norm value to normalize to or the lower range boundary in case of the range normalization.
+    beta – upper range boundary in case of the range normalization; it is not used for the norm normalization.
+    normType – normalization type (see the details below).
+    dtype – when negative, the output array has the same type as src; otherwise, it has the same number of channels as src and the depth =CV_MAT_DEPTH(dtype).
+    mask – optional operation mask.
+  */
+   
+   Mat image1dst_norm;
+   Mat image2dst_norm;
 
-  //DescriptorExtractor* FreakDesc = new DescriptorExtractor("FREAK");
+   normalize( image1dst, image1dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
+   normalize( image2dst, image2dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
 
-  FreakDesc = DescriptorExtractor::create("FREAK");
+  /*
+  On each element of the input array, the function convertScaleAbs performs three operations sequentially: scaling, taking an absolute value, conversion to an unsigned 8-bit type:
 
+  */
+
+  Mat image1dst_norm_scaled;
+  Mat image2dst_norm_scaled;
+  
+  convertScaleAbs( image1dst_norm, image1dst_norm_scaled );
+  convertScaleAbs( image2dst_norm, image2dst_norm_scaled );
+   
+   KeyPoint kp;
+
+  for( int j = 0; j < image1dst_norm.rows ; j++ )
+     { for( int i = 0; i < image1dst_norm.cols; i++ )
+          {
+            if( (int) image1dst_norm.at<float>(j,i) > threshHarris )
+              {
+		
+                kp.pt.x=(float) j;
+                kp.pt.y=(float) i;
+                //necessaire je ne sais pas pk
+                kp.size=100.0;
+  		keypoints1.push_back(kp);
+               
+              }
+          }
+     }
+
+  for( int j = 0; j < image2dst_norm.rows ; j++ )
+     { for( int i = 0; i < image2dst_norm.cols; i++ )
+          {
+            if( (int) image2dst_norm.at<float>(j,i) > threshHarris )
+              {
+
+
+                kp.pt.x=(float) j;
+                kp.pt.y=(float) i;
+                //necessaire je ne sais pas pk
+                 kp.size=100.0;
+  		keypoints2.push_back(kp);
+               
+              }
+          }
+     }
+ 
+
+  BriefDescriptorExtractor briefDesc(64);
+  
   Mat descriptors1,descriptors2;
-  (&FreakDesc)->compute(image1,keypoints1,descriptors1);
-  (&FreakDesc)->compute(image2,keypoints2,descriptors2);
+  briefDesc.compute(image1,keypoints1,descriptors1);
+  briefDesc.compute(image2,keypoints2,descriptors2);
 
-  
-  
-  // Construction of the matcher
-  //BruteForceMatcher< HammingLUT > matcher;
-  BruteForceMatcher<Hamming> matcher;// =BruteForceMatcher<Hamming>(10);
+
+  BruteForceMatcher<Hamming> matcher;
 
   Mat descriptorAuxKp1;
   Mat descriptorAuxKp2;
@@ -133,7 +219,7 @@ int main( int, char** argv )
       float distance=sqrt(pow((p1x-p2x),2)+pow((p1y-p2y),2));
       
 	//parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie du keypoints en cours, en l'occurence le ieme ici.
-      if(distance<4){
+      if(distance<10){
        
         descriptorAuxKp2.push_back(descriptors2.row(j));
         associateIdx.push_back(j);
@@ -167,9 +253,9 @@ int main( int, char** argv )
  // position of the sorted element
              // end position
 
-Mat imageMatches;
-Mat matchesMask;
-drawMatches(
+  Mat imageMatches;
+  Mat matchesMask;
+  drawMatches(
   image1,keypoints1, // 1st image and its keypoints
   image2,keypoints2, // 2nd image and its keypoints
   matchesWithDist,            // the matches
@@ -179,8 +265,8 @@ drawMatches(
   );
 
 
-  namedWindow( "Matches BRIEF", CV_WINDOW_AUTOSIZE );
-  imshow( "Matches BRIEF", imageMatches );
+  namedWindow(  matches_window, CV_WINDOW_AUTOSIZE );
+  imshow(  matches_window, imageMatches );
   imwrite("resultat.png", imageMatches);
   
 
@@ -188,7 +274,7 @@ drawMatches(
   /// Create a window and a trackbar
   namedWindow(transparency_window, WINDOW_AUTOSIZE );
   createTrackbar( "Threshold: ", transparency_window, &thresh, max_thresh, interface );
-  //imshow(transparency_window,image1 );
+  
 
 
 
