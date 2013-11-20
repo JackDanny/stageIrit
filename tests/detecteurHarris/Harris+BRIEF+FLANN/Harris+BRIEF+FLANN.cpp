@@ -185,8 +185,8 @@ int main(int, char **argv)
     briefDesc.compute(image1, keypoints1, descriptors1);
     briefDesc.compute(image2, keypoints2, descriptors2);
 
-
-    FlannBasedMatcher < Hamming > matcher;
+    //Ptr<DescriptorMatcher> matcher =  new FlannBasedMatcher(DescriptorMatcher::create("Flann"));
+    FlannBasedMatcher matcher;
 
     Mat descriptorAuxKp1;
     Mat descriptorAuxKp2;
@@ -226,7 +226,10 @@ int main(int, char **argv)
 
 	}
 	//ici on ne matche qu'un keypoints de l'image1 avec tous les keypoints gardés de l'image 2
-	matcher.match(descriptorAuxKp1, descriptorAuxKp2, matches);
+        matcher.add(descriptorAuxKp1);
+        matcher.train();
+
+	matcher.match(descriptorAuxKp2, matches);
 
 	//on remet à la bonne valeur les attributs de matches
 	for (int idxMatch = 0; idxMatch < matches.size(); idxMatch++) {

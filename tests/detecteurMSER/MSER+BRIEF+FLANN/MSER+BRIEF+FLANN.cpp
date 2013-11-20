@@ -22,9 +22,8 @@ Mat image1, image2;
 int rows;
 int cols;
 
-const char* transparency_window = "transparence ORB+BRIEF+BF";
-const char* matches_window = "ORB+BRIEF+BF";
- 
+const char* transparency_window = "transparence";
+const char *matches_window = "MSER+BRIEF+BF";
 
 int thresh = 0;
 int max_thresh = 100;
@@ -37,34 +36,24 @@ int max_thresh = 100;
   //vector<vector<DMatch> > matchesWithDist;
   vector<DMatch> matchesWithDist;
 
-   /*
-    C++: ORB::ORB(
-int nfeatures=500, 
-float scaleFactor=1.2f, 
-int nlevels=8, 
-int edgeThreshold=31, 
-int firstLevel=0, 
-int WTA_K=2, 
-int scoreType=ORB::HARRIS_SCORE, 
-int patchSize=31)
 
-
-    Parameters:	
-
-        nfeatures – The maximum number of features to retain.
-        scaleFactor – Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor will mean that to cover certain scale range you will need more pyramid levels and so the speed will suffer.
-        nlevels – The number of pyramid levels. The smallest level will have linear size equal to input_image_linear_size/pow(scaleFactor, nlevels).
-        edgeThreshold – This is size of the border where the features are not detected. It should roughly match the patchSize parameter.
-        firstLevel – It should be 0 in the current implementation.
-        WTA_K – The number of points that produce each element of the oriented BRIEF descriptor. The default value 2 means the BRIEF where we take a random point pair and compare their brightnesses, so we get 0/1 response. Other possible values are 3 and 4. For example, 3 means that we take 3 random points (of course, those point coordinates are random, but they are generated from the pre-defined seed, so each element of BRIEF descriptor is computed deterministically from the pixel rectangle), find point of maximum brightness and output index of the winner (0, 1 or 2). Such output will occupy 2 bits, and therefore it will need a special variant of Hamming distance, denoted as NORM_HAMMING2 (2 bits per bin). When WTA_K=4, we take 4 random points to compute each bin (that will also occupy 2 bits with possible values 0, 1, 2 or 3).
-        scoreType – The default HARRIS_SCORE means that Harris algorithm is used to rank features (the score is written to KeyPoint::score and is used to retain best nfeatures features); FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints, but it is a little faster to compute.
-        patchSize – size of the patch used by the oriented BRIEF descriptor. Of course, on smaller pyramid layers the perceived image area covered by a feature will be larger.
-*/
-
-
-  ORB detector(200);
+  /*
+   *
+   * cv::MserFeatureDetector::MserFeatureDetector (
+   *    	int  	delta, //in the code, it compares (size_{i}-size_{i-delta})/size_{i-delta} 
+   * 		int  	minArea, //prune the area which smaller than minArea 
+   *		int  	maxArea, //prune the area which bigger than maxArea 
+   *		double  maxVariation, //prune the area have simliar size to its children 
+   *		double  minDiversity, //trace back to cut off mser with diversity < min_diversity 
+   *		int  	maxEvolution, //for color image, the evolution steps 
+   *		double  areaThreshold, //the area threshold to cause re-initialize 
+   *		double  minMargin,  //ignore too small margin 
+   *		int  	edgeBlurSize //the aperture size for edge blur 
+   *	) 	
+   */
+    MserFeatureDetector detector;
   
-  BriefDescriptorExtractor descriptor(64);
+    BriefDescriptorExtractor descriptor(64);
 
 
 
@@ -90,19 +79,10 @@ int main( int, char** argv )
   namedWindow( "image2", WINDOW_AUTOSIZE );
   imshow( "image2",image2 );
 
-  Mat image1_grey;
-  Mat image2_grey;
   
-  cvtColor( image1, image1_grey, COLOR_BGR2GRAY );
-  cvtColor( image2,image2_grey, COLOR_BGR2GRAY );
 
-
-  
-  detector(image1_grey,Mat(),keypoints1);
-  detector(image2_grey,Mat(),keypoints2);
-
-  //detector.detect(image1,keypoints1);
-  //detector.detect(image2,keypoints2);
+  detector.detect(image1,keypoints1);
+  detector.detect(image2,keypoints2);
 
   
   Mat descriptors1,descriptors2;
@@ -113,7 +93,7 @@ int main( int, char** argv )
   
   // Construction of the matcher
   //BruteForceMatcher< HammingLUT > matcher;
-  BruteForceMatcher<Hamming> matcher;// =BruteForceMatcher<Hamming>(10);
+  FlannBasedMatcher matcher;// =BruteForceMatcher<Hamming>(10);
 
   Mat descriptorAuxKp1;
   Mat descriptorAuxKp2;
@@ -151,15 +131,8 @@ int main( int, char** argv )
       }
       
 
-    }/*
-    cout<<"\nk1 ";
-    cout<<"\nangle " << keypoints1[0].angle;
-    cout<<"\nclass_id " << keypoints1[0].class_id;
-    cout<<"\noctave " << keypoints1[0].octave ;
-    cout<<"\npt " << keypoints1[0].pt ;
-    cout<<"\nresponse " << keypoints1[0].response;
-    cout<<"\nsize " << keypoints1[0].size;
-    */
+    }
+
 
 
     //ici on ne matche qu'un keypoints de l'image1 avec tous les keypoints gardés de l'image 2
