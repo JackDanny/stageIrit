@@ -22,8 +22,8 @@ Mat image1, image2;
 int rows;
 int cols;
 
-const char *transparency_window = "transparence";
-const char *matches_window = "MSER+BRIEF+BF";
+string transparency_window;
+string matches_window;
 
 int thresh = 0;
 int max_thresh = 100;
@@ -37,8 +37,10 @@ vector < DMatch > matches;
 vector < DMatch > matchesWithDist;
 
 
+//LES DETECTEURS
+
+//utilisation de MSER
   /*
-   *
    * cv::MserFeatureDetector::MserFeatureDetector (
    *            int     delta, //in the code, it compares (size_{i}-size_{i-delta})/size_{i-delta} 
    *            int     minArea, //prune the area which smaller than minArea 
@@ -51,9 +53,165 @@ vector < DMatch > matchesWithDist;
    *            int     edgeBlurSize //the aperture size for edge blur 
    *    )       
    */
-MserFeatureDetector detector;
 
-BriefDescriptorExtractor descriptor(64);
+//utilisation de FAST
+
+ /* cv::FastFeatureDetector::FastFeatureDetector ( 
+   *	int threshold = 10,
+   *	bool nonmaxSuppression = true	 
+   *	) 	
+   */
+
+//utilisation de STAR
+
+/*
+   *cv::StarFeatureDetector::StarFeatureDetector (
+	int maxSize,
+	int responseThreshold = 30,
+	int lineThresholdProjected = 10,
+	int lineThresholdBinarized = 8,
+	int suppressNonmaxSize = 5	 
+   ) 	
+   */
+
+//utilisation de SIFT
+/*
+cv::SiftFeatureDetector::SiftFeatureDetector ( 
+	double  threshold,
+	double  edgeThreshold,
+	int nOctaves = SIFT::CommonParams::DEFAULT_NOCTAVES,
+	int nOctaveLayers = SIFT::CommonParams::DEFAULT_NOCTAVE_LAYERS,
+	int firstOctave = SIFT::CommonParams::DEFAULT_FIRST_OCTAVE,
+	int angleMode = SIFT::CommonParams::FIRST_ANGLE	 
+  ) 	
+*/
+
+//utilisation de SURF
+/*
+cv::SurfFeatureDetector::SurfFeatureDetector ( 
+        double hessianThreshold = 400.,
+	int octaves = 3,
+	int octaveLayers = 4	 
+	) 
+*/
+
+//utilisation de ORB
+/*
+ORB::ORB(
+int nfeatures=500, 
+float scaleFactor=1.2f, 
+int nlevels=8, 
+int edgeThreshold=31, 
+int firstLevel=0, 
+int WTA_K=2, 
+int scoreType=ORB::HARRIS_SCORE, 
+int patchSize=31)	
+*/
+
+//utilisation de HARRIS avec GoodFeaturesToTrackDetector
+/*
+ 	GoodFeaturesToTrackDetector (
+         int maxCorners, 
+         double qualityLevel, 
+         double minDistance, 
+         int blockSize=3, 
+         true, 
+         double k=0.04)
+*/    
+
+//utilisation de GFTT
+/*
+ 	GoodFeaturesToTrackDetector (
+         int maxCorners, 
+         double qualityLevel, 
+         double minDistance, 
+         int blockSize=3, 
+         bool useHarrisDetector=false, 
+         double k=0.04)
+*/    
+
+//utilisation de DENSE
+
+  /*
+
+  cv::DenseFeatureDetector::Params::Params ( 
+	float  	initFeatureScale = 1.f,
+	int  	featureScaleLevels = 1,
+	float  	featureScaleMul = 0.1f,
+	int  	initXyStep = 6,
+	int  	initImgBound = 0,
+	bool  	varyXyStepWithScale = true,
+	bool  	varyImgBoundWithScale = false	 
+	) 	
+
+  */
+
+//utilisation de SIMPLE BLOB
+
+/*
+
+class SimpleBlobDetector : public FeatureDetector
+{
+public:
+struct Params
+{
+    Params();
+    float thresholdStep;
+    float minThreshold;
+    float maxThreshold;
+    size_t minRepeatability;
+    float minDistBetweenBlobs;
+
+    bool filterByColor;
+    uchar blobColor;
+
+    bool filterByArea;
+    float minArea, maxArea;
+
+    bool filterByCircularity;
+    float minCircularity, maxCircularity;
+
+    bool filterByInertia;
+    float minInertiaRatio, maxInertiaRatio;
+
+    bool filterByConvexity;
+    float minConvexity, maxConvexity;
+};
+
+SimpleBlobDetector(const SimpleBlobDetector::Params &parameters = SimpleBlobDetector::Params());
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Les descripteurs
+
+
+
+
+
+
+
 
 
 
@@ -66,12 +224,196 @@ void interface(int argc, void *);
 int main(int argc, char **argv)
 {
 
+ DescriptorExtractor* descriptor;
 
+
+    if(argc!=5){
+      cout << "\nusage incorrect!\n\n";
+      cout << "pathimage1 pathimage2 detectorName descriptorName\n" <<endl;
+
+       cout << "\n detectorNameList:";
+       cout << "\n MSER";
+       cout << "\n FAST";
+       cout << "\n STAR";
+       cout << "\n SIFT";
+ 	cout << "\n SURF";
+	cout << "\n ORB";
+	cout << "\n HARRIS";
+	cout << "\n GFTT";
+	cout << "\n DENSE";
+	cout << "\n SIMPLE BLOB\n";
+
+      exit(0);
+    }
 
    
 
     image1 = imread(argv[1], 1);
     image2 = imread(argv[2], 1);
+    String detectorName=argv[3];
+    //cout << "\n nom du détecteur: "<<argv[3];
+
+    if(strcmp(argv[3],"MSER")==0){
+    	MserFeatureDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+    }
+
+
+    else if(strcmp(argv[3],"FAST")==0){
+       FastFeatureDetector detector(50,true);
+       detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+    }
+
+
+    else if(strcmp(argv[3],"STAR")==0){
+       StarFeatureDetector detector;
+       detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+
+   }
+
+
+  else if(strcmp(argv[3],"SIFT")==0){
+       SiftFeatureDetector detector;
+       detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+
+   }
+
+  else if(strcmp(argv[3],"SURF")==0){
+       SurfFeatureDetector detector(2000);
+       detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+
+   }
+
+  //different
+  else if(strcmp(argv[3],"ORB")==0){
+       ORB detector(200);
+       detector(image1,Mat(),keypoints1);
+       detector(image2,Mat(),keypoints2);
+
+
+   }
+   /*
+   else if(strcmp(argv[3],"BRISK")==0){
+       BRISK detector;
+       detector(image1,Mat(),keypoints1);
+       detector(image2,Mat(),keypoints2);
+
+
+   }
+   */
+    else if(strcmp(argv[3],"HARRIS")==0){
+       GoodFeaturesToTrackDetector detector( 1000,0.01,1., 3,true, 0.04);
+      detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+
+
+   }
+   else if(strcmp(argv[3],"GFTT")==0){
+       GoodFeaturesToTrackDetector detector;
+      detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+   }
+
+  else if(strcmp(argv[3],"DENSE")==0){
+       DenseFeatureDetector detector(0.5);
+      detector.detect(image1, keypoints1);
+       detector.detect(image2, keypoints2);
+
+   }
+   else if(strcmp(argv[3],"SIMPLE BLOB")==0){
+      cv::SimpleBlobDetector::Params params; 
+      params.minDistBetweenBlobs = 10.0;  // minimum 10 pixels between blobs
+      params.filterByArea = true;         // filter my blobs by area of blob
+      params.minArea = 10.0;              // min 20 pixels squared
+      params.maxArea = 500.0;             // max 500 pixels squared
+      SimpleBlobDetector detector(params);
+
+
+  
+  detector.detect(image1,keypoints1);
+  detector.detect(image2,keypoints2);
+
+   }
+    else{
+
+       cout << "\n detecteur inconnu"<<endl;
+       cout << "\n liste des détecteurs possible:";
+       cout << "\n MSER";
+       cout << "\n FAST";
+       cout << "\n STAR";
+       cout << "\n SIFT";
+ 	cout << "\n SURF";
+	cout << "\n ORB";
+	cout << "\n HARRIS";
+	cout << "\n GFTT";
+	cout << "\n DENSE";
+	cout << "\n SIMPLE BLOB";
+       cout <<"\n";
+       exit(0);
+    }
+
+
+    //selection du descripteur
+
+
+
+    if(strcmp(argv[4],"SIFT")==0){
+    	SiftDescriptorExtractor* descriptorAux;
+        descriptor=descriptorAux;
+        //descriptor = descriptorAux;
+
+
+    }
+    else{
+      exit(0);
+    }
+
+
+    
+
+
+
+
+
+
+    /*
+    char* title1 = argv[3];
+    char* title2;
+    strcpy(title2,"transparence");
+    strcat(title2,argv[3]); 
+   
+    matches_window=title1;
+    transparency_window=title2;
+    */
+    /*char* title1;
+    title1 = "transparence";
+    title1=title1 + argv[3];
+    transparency_window=title1;
+    */
+
+    //transparency_window << "transparence " + argv[3];
+    string st1=argv[3];
+    string st2="transparence + ";
+   
+    string st3 = st2 + argv[3];
+
+    transparency_window = st1; 
+    matches_window= st3;
+ 
+
+
     rows = image1.rows;
     cols = image1.cols;
 
@@ -83,14 +425,13 @@ int main(int argc, char **argv)
 
 
 
-    detector.detect(image1, keypoints1);
-    detector.detect(image2, keypoints2);
+    
 
 
     Mat descriptors1, descriptors2;
 
-    descriptor.compute(image1, keypoints1, descriptors1);
-    descriptor.compute(image2, keypoints2, descriptors2);
+    descriptor->compute(image1, keypoints1, descriptors1);
+    descriptor->compute(image2, keypoints2, descriptors2);
 
 
 
@@ -177,7 +518,9 @@ int main(int argc, char **argv)
             pointsx.push_back(keypoints1[i]);
 
 	    //on calcule le descripteur de tous les pixels retenus comme candidat
-            descriptor.compute(image2, keypointsVois, descriptorVois);
+           
+            descriptor->compute(image2, keypointsVois, descriptorVois);
+ 
 
 
 	    //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2

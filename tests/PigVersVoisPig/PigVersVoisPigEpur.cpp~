@@ -63,10 +63,12 @@ void interface(int argc, void *);
 /**
  * @function main
  */
-int main(int, char **argv)
+int main(int argc, char **argv)
 {
 
-    bool aCorres = false;
+
+
+   
 
     image1 = imread(argv[1], 1);
     image2 = imread(argv[2], 1);
@@ -97,7 +99,6 @@ int main(int, char **argv)
     BruteForceMatcher < Hamming > matcher;	// =BruteForceMatcher<Hamming>(10);
 
     Mat descriptorAuxKp1;
-    Mat descriptorAuxKp2;
 
     Mat descriptorVois;
 
@@ -106,10 +107,10 @@ int main(int, char **argv)
 
     vector < KeyPoint > keypointsVois;
    
-   
-
-
-    /*nb de points reliés */
+    
+    //si on a trouvé un keypoint2 de l'image2 correspondant au keypoint1 de l'image 1 en cours
+     bool aCorres = false;
+    //nb de points reliés 
     int pointCourant = 0;
 
     for (int i = 0; i < keypoints1.size(); i++) {
@@ -118,8 +119,6 @@ int main(int, char **argv)
 	//on copie la ligne i du descripteur, qui correspond aux différentes valeurs données par le descripteur pour le Keypoints[i]
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
-//ici on ne va mettre que les valeurs du descripteur des keypoints de l'image 2 que l'on veut comparer aux keypoints de l'image1 en cours de traitement
-	descriptorAuxKp2.create(0, 0, CV_8UC1);
 
 
 //on supprime tous les keypointsvoisins associé au keypoint1 precedent precedants
@@ -170,6 +169,8 @@ int main(int, char **argv)
 	}			//fin for(int j=0;j<descriptors2.rows;j++)
 
 
+
+
 	//il faudra vérifier que le kp1 a un kp2 possible
 	if (aCorres) {
             //on sait que le keypoints1[i] va être relié
@@ -178,9 +179,6 @@ int main(int, char **argv)
 	    //on calcule le descripteur de tous les pixels retenus comme candidat
             descriptor.compute(image2, keypointsVois, descriptorVois);
 
-            /*for (int idxVois = 0; idxVois < descriptorVois.rows; idxVois++) {
-		    descriptorAuxKp2.push_back(descriptorVois.row(idxVois));
-	    }*/
 
 	    //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2
 	    matcher.match(descriptorAuxKp1, descriptorVois, matches);
@@ -212,35 +210,10 @@ int main(int, char **argv)
 
 
 //ici on trie les matchesWithDist par distance des valeurs des descripteurs et non par distance euclidienne
-    //nth_element(matchesWithDist.begin(), matchesWithDist.begin() + 24, matchesWithDist.end());
+    nth_element(matchesWithDist.begin(), matchesWithDist.begin() + 24, matchesWithDist.end());
     // initial position
     // position of the sorted element
     // end position
-    for(int i=0;i<matchesWithDist.size();i++){
-
-
-//pour voir les coordonnées de qui avec qui
-/*
-      cout <<"\npoint "<<matchesWithDist[i].queryIdx;
-cout <<"x="<< pointsx[matchesWithDist[i].queryIdx].pt.x;
-      cout <<" y="<<pointsy[matchesWithDist[i].queryIdx].pt.y;
-      cout <<" avec point "<<matchesWithDist[i].trainIdx;
-cout <<"x="<< pointsy[matchesWithDist[i].trainIdx].pt.x;
-      cout <<" y="<<pointsy[matchesWithDist[i].trainIdx].pt.y;
-*/
-
-//pour voir quels points posent soucis
- /* cout <<"\npoint "<<matchesWithDist[i].queryIdx;
-  cout <<"\ndiffx = "<<pointsx[matchesWithDist[i].queryIdx].pt.x - pointsy[matchesWithDist[i].trainIdx].pt.x;
-   cout <<"\ndiffy = "<<pointsy[matchesWithDist[i].queryIdx].pt.y - pointsy[matchesWithDist[i].trainIdx].pt.y;;
-  
-*/
-
-
-
-
-    }
-
 
    
     Mat imageMatches;
