@@ -118,11 +118,11 @@ int main(int, char **argv)
 	//on copie la ligne i du descripteur, qui correspond aux différentes valeurs données par le descripteur pour le Keypoints[i]
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
-//ici on va mettre que les valeurs du descripteur des keypoints de l'image 2 que l'on veut comparer aux keypoints de l'image1 en cours de traitement
+//ici on ne va mettre que les valeurs du descripteur des keypoints de l'image 2 que l'on veut comparer aux keypoints de l'image1 en cours de traitement
 	descriptorAuxKp2.create(0, 0, CV_8UC1);
 
 
-//on supprime tous les keypointsvoisins precedants
+//on supprime tous les keypointsvoisins associé au keypoint1 precedent precedants
 	keypointsVois.erase(keypointsVois.begin(), keypointsVois.end());
 	for (int j = 0; j < keypoints2.size(); j++) {
 
@@ -134,17 +134,14 @@ int main(int, char **argv)
 	    float distance = sqrt( pow((p1x - p2x), 2) + pow( (p1y - p2y) ,  2));
 
             
-	    //parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie du keypoints en cours, en l'occurence le ieme ici.
+	    //parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie(e.g 4) du keypoints en cours(ici c'est le ieme keypoint).
 	    if (distance < 4) {
+
+ 		//on a au moins un keypoint correspondant
 		aCorres = true;
-           
-
-
 		KeyPoint kpVois;
 
-                
-
-
+		//on rajoute les pixels du 9 voisinage dans la liste des keypoints2 à matcher
 		for (float ivois = -1; ivois < 2; ivois++) {
 
 		    for (float jvois = -1; jvois < 2; jvois++) {
@@ -154,49 +151,16 @@ int main(int, char **argv)
 			kpVois.pt.x = p2x + ivois;
 			kpVois.pt.y = p2y + jvois;
                         kpVois.size = keypoints1[0].size;
-                       // keypointsVois.push_back(kpVois);
 
-			/*il faut que les coordonnes du point en question soient contenus dans l'image */
+			//il faut que les coordonnes du point en question soient contenus dans l'image
 			if (kpVois.pt.x >= 0 && kpVois.pt.x < image1.rows
 			    && kpVois.pt.y >= 0 && kpVois.pt.y < image1.cols) {
                            
-                       /*if(pointCourant == 77){
-
-                             cout << "\np1x:" << p1x;
-                             cout << "\np2x:" << kpVois.pt.x;
-                             cout << "\np1y:" << p1y;
-                             cout << "\np2y:" << kpVois.pt.y << "\n";
-
-
-
- 		          
-                        }*/
-
-
-
 			    keypointsVois.push_back(kpVois);
 
 			}
 		    }
 		}
-               
-
-
-		/*on calcule les descripteurs des keypointsVois */
-		//descriptor.compute(image2, keypointsVois, descriptorVois);
-                 
-		/*         float pxvois=keypoints1[i].pt.x;
-		   float pyvois=keypoints1[i].pt.y;
-		   float p2xvois=keypoints2[j].pt.x;
-		   float p2yvois=keypoints2[j].pt.y; */
-
-
-		
-
-		//descriptorAuxKp2.push_back(descriptors2.row(j));
-		//associateIdx.push_back(j);
-
-
 
 	    }			//fin de if(distance<4)
 
@@ -344,11 +308,7 @@ void interface(int, void *)
     float kpty;
 
     vector < KeyPoint > keypointsKeep1, keypointsKeep2;
-/*
-    cout << "\n taille de matchesWithDist "<< matchesWithDist.size();
-    cout << "\n taille de pointsx "<< pointsx.size();
-    cout << "\n taille de pointsy "<< pointsy.size();
-*/
+
 
     for (int i = 0; i < matchesWithDist.size(); i++) {
 

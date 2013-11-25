@@ -105,8 +105,8 @@ int main(int, char **argv)
     vector < int >associateIdxVois;
 
     vector < KeyPoint > keypointsVois;
-    vector < KeyPoint > pointsx;
-    vector < KeyPoint > pointsy;
+   
+   
 
 
     /*nb de points reliés */
@@ -121,6 +121,8 @@ int main(int, char **argv)
 //ici on va mettre que les valeurs du descripteur des keypoints de l'image 2 que l'on veut comparer aux keypoints de l'image1 en cours de traitement
 	descriptorAuxKp2.create(0, 0, CV_8UC1);
 
+
+//on supprime tous les keypointsvoisins precedants
 	keypointsVois.erase(keypointsVois.begin(), keypointsVois.end());
 	for (int j = 0; j < keypoints2.size(); j++) {
 
@@ -129,49 +131,67 @@ int main(int, char **argv)
 	    float p2x = keypoints2[j].pt.x;
 	    float p2y = keypoints2[j].pt.y;
 
-	    float distance = sqrt(pow((p1x - p2x), 2) + pow((p1y - p2y), 2));
+	    float distance = sqrt( pow((p1x - p2x), 2) + pow( (p1y - p2y) ,  2));
 
+            
 	    //parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie du keypoints en cours, en l'occurence le ieme ici.
 	    if (distance < 4) {
 		aCorres = true;
+           
+
 
 		KeyPoint kpVois;
 
                 
 
 
-		for (int ivois = -1; ivois < 2; ivois++) {
+		for (float ivois = -1; ivois < 2; ivois++) {
 
-		    for (int jvois = -1; jvois < 2; jvois++) {
+		    for (float jvois = -1; jvois < 2; jvois++) {
+
+                        
 
 			kpVois.pt.x = p2x + ivois;
 			kpVois.pt.y = p2y + jvois;
-                        kpVois.size = keypoints2[0].size;
+                        kpVois.size = keypoints1[0].size;
                        // keypointsVois.push_back(kpVois);
 
 			/*il faut que les coordonnes du point en question soient contenus dans l'image */
-			if (kpVois.pt.x >= 0 && kpVois.pt.x < image2.rows
-			    && kpVois.pt.y >= 0 && kpVois.pt.y < image2.cols) {
+			if (kpVois.pt.x >= 0 && kpVois.pt.x < image1.rows
+			    && kpVois.pt.y >= 0 && kpVois.pt.y < image1.cols) {
+                           
+                       /*if(pointCourant == 77){
+
+                             cout << "\np1x:" << p1x;
+                             cout << "\np2x:" << kpVois.pt.x;
+                             cout << "\np1y:" << p1y;
+                             cout << "\np2y:" << kpVois.pt.y << "\n";
+
+
+
+ 		          
+                        }*/
+
+
 
 			    keypointsVois.push_back(kpVois);
 
 			}
 		    }
 		}
+               
 
 
 		/*on calcule les descripteurs des keypointsVois */
-		descriptor.compute(image2, keypointsVois, descriptorVois);
-
+		//descriptor.compute(image2, keypointsVois, descriptorVois);
+                 
 		/*         float pxvois=keypoints1[i].pt.x;
 		   float pyvois=keypoints1[i].pt.y;
 		   float p2xvois=keypoints2[j].pt.x;
 		   float p2yvois=keypoints2[j].pt.y; */
 
 
-		for (int idxVois = 0; idxVois < descriptorVois.rows; idxVois++) {
-		    descriptorAuxKp2.push_back(descriptorVois.row(idxVois));
-		}
+		
 
 		//descriptorAuxKp2.push_back(descriptors2.row(j));
 		//associateIdx.push_back(j);
@@ -188,24 +208,32 @@ int main(int, char **argv)
 
 	//il faudra vérifier que le kp1 a un kp2 possible
 	if (aCorres) {
-	    pointsx.push_back(keypoints1[i]);
+            //on sait que le keypoints1[i] va être relié
+            pointsx.push_back(keypoints1[i]);
 
+	    //on calcule le descripteur de tous les pixels retenus comme candidat
+            descriptor.compute(image2, keypointsVois, descriptorVois);
 
-
+            /*for (int idxVois = 0; idxVois < descriptorVois.rows; idxVois++) {
+		    descriptorAuxKp2.push_back(descriptorVois.row(idxVois));
+	    }*/
 
 	    //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2
-	    matcher.match(descriptorAuxKp1, descriptorAuxKp2, matches);
+	    matcher.match(descriptorAuxKp1, descriptorVois, matches);
 
 	    //on a trouvé le keypoints qui va le mieux
 	    //nrmlt on a trouvé un kp
 
-	    cout << "\n On a trouvé " << matches.size() << " points correspondants";
+	    //cout << "\n On a trouvé " << matches.size() << " points correspondants";
 	    KeyPoint best2 = keypointsVois[matches[0].trainIdx];
 
 	    pointsy.push_back(best2);
 
 	    matches[0].trainIdx = pointCourant;
 	    matches[0].queryIdx = pointCourant;
+            
+
+
             pointCourant++;
 	    matchesWithDist.insert(matchesWithDist.end(), matches.begin(), matches.end());
 
@@ -220,11 +248,37 @@ int main(int, char **argv)
 
 
 //ici on trie les matchesWithDist par distance des valeurs des descripteurs et non par distance euclidienne
-    nth_element(matchesWithDist.begin(), matchesWithDist.begin() + 24, matchesWithDist.end());
+    //nth_element(matchesWithDist.begin(), matchesWithDist.begin() + 24, matchesWithDist.end());
     // initial position
     // position of the sorted element
     // end position
+    for(int i=0;i<matchesWithDist.size();i++){
 
+
+//pour voir les coordonnées de qui avec qui
+/*
+      cout <<"\npoint "<<matchesWithDist[i].queryIdx;
+cout <<"x="<< pointsx[matchesWithDist[i].queryIdx].pt.x;
+      cout <<" y="<<pointsy[matchesWithDist[i].queryIdx].pt.y;
+      cout <<" avec point "<<matchesWithDist[i].trainIdx;
+cout <<"x="<< pointsy[matchesWithDist[i].trainIdx].pt.x;
+      cout <<" y="<<pointsy[matchesWithDist[i].trainIdx].pt.y;
+*/
+
+//pour voir quels points posent soucis
+ /* cout <<"\npoint "<<matchesWithDist[i].queryIdx;
+  cout <<"\ndiffx = "<<pointsx[matchesWithDist[i].queryIdx].pt.x - pointsy[matchesWithDist[i].trainIdx].pt.x;
+   cout <<"\ndiffy = "<<pointsy[matchesWithDist[i].queryIdx].pt.y - pointsy[matchesWithDist[i].trainIdx].pt.y;;
+  
+*/
+
+
+
+
+    }
+
+
+   
     Mat imageMatches;
     Mat matchesMask;
     drawMatches(image1, pointsx,	// 1st image and its keypoints
@@ -295,10 +349,10 @@ void interface(int, void *)
     for (int i = 0; i < matchesWithDist.size(); i++) {
 
 
-	kp1x = keypoints1[matchesWithDist[i].queryIdx].pt.x;
-	kp1y = keypoints1[matchesWithDist[i].queryIdx].pt.y;
-	kp2x = keypoints2[matchesWithDist[i].trainIdx].pt.x;
-	kp2y = keypoints2[matchesWithDist[i].trainIdx].pt.y;
+	kp1x = pointsx[matchesWithDist[i].queryIdx].pt.x;
+	kp1y = pointsx[matchesWithDist[i].queryIdx].pt.y;
+	kp2x = pointsy[matchesWithDist[i].trainIdx].pt.x;
+	kp2y = pointsy[matchesWithDist[i].trainIdx].pt.y;
 
 	kptx = kp1x * (100. - thresh) / 100. + kp2x * (thresh / 100.);
 	kpty = kp1y * (100. - thresh) / 100. + kp2y * (thresh / 100.);
