@@ -53,8 +53,8 @@ int max_thresh = 100;
   DenseFeatureDetector detector(0.5);
   
   
-  BriefDescriptorExtractor descriptor(64);
-
+  //BriefDescriptorExtractor descriptor(32);
+  
 
 
 /// Function header

@@ -36,8 +36,11 @@ vector < DMatch > matches;
 //vector<vector<DMatch> > matchesWithDist;
 vector < DMatch > matchesWithDist;
 
-
-//LES DETECTEURS
+/****************************/
+/*                          */
+/*      LES DETECTEURS      */
+/*                          */
+/****************************/
 
 //utilisation de MSER
 /*
@@ -119,7 +122,7 @@ int patchSize=31)
          double k=0.04)
 */
 
-//utilisation de GFTT
+//utilisation de GFTT i.e cornerMinEigenVal, les minimum des valeurs propres des vecteurs.
 /*
  	GoodFeaturesToTrackDetector (
          int maxCorners,
@@ -196,23 +199,42 @@ SimpleBlobDetector(const SimpleBlobDetector::Params &parameters = SimpleBlobDete
 
 
 
+ /**************************************/
+ /*                                    */
+ /*          LES DESCRIPTEURS          */  
+ /*                                    */
+ /**************************************/
 
 
 
+//SIFT
+
+//SURF
+
+//BRIEF
+
+//ORB
 
 
 
+ /**************************************/
+ /*                                    */
+ /*           LES APPARIEURS           */
+ /*                                    */
+ /**************************************/
+
+/*apparieurs fonctionnant avec les descripteurs SIFT et SURF*/
+
+//BruteForce
+
+//BruteForce-L1
 
 
-//Les descripteurs
+/*apparieurs fonctionnant avec les descripteurs BRIEF et ORB */
 
-//cv::Ptr<cv::DescriptorExtractor> descriptor =cv::Algorithm::create<cv::DescriptorExtractor>("Feature2D.BRISK");
+//BruteForce-Hamming
 
-
-
-
-
-//descriptor
+//FlannBased
 
 
 
@@ -224,19 +246,22 @@ void interface(int argc, void *);
  */
 
 
+
 int main(int argc, char **argv)
 {
 
-   // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create("SURF");
-    //Ptr<DescriptorExtractor> descriptor = new SiftDescriptorExtractor(40);
-    cv::Ptr<cv::DescriptorExtractor> descriptor;  
+  
+   Ptr<DescriptorExtractor> descriptor;  
+   Ptr<DescriptorMatcher> matcher;
    
-    if(argc!=5)
+   
+   
+    if(argc!=6)
     {
         cout << "\nusage incorrect!\n\n";
-        cout << "pathimage1 pathimage2 detectorName descriptorName\n" <<endl;
+        cout << "pathimage1 pathimage2 detectorName descriptorName matcherName\n" <<endl;
 
-        cout << "\n detectorNameList:";
+        cout << "\n detectorName List:";
         cout << "\n MSER";
         cout << "\n FAST";
         cout << "\n STAR";
@@ -247,6 +272,27 @@ int main(int argc, char **argv)
         cout << "\n GFTT";
         cout << "\n DENSE";
         cout << "\n SIMPLE BLOB\n";
+        cout << endl;
+
+        cout << "\n descriptorName List:";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n BRIEF";
+        cout << "\n ORB";
+        cout << endl;
+
+        cout << "\n matcherName List:";
+
+        cout << "\n\n pour les descripteurs SIFT et SURF\n";
+        cout << "\n BruteForce";
+        cout << "\n BruteForce-L1";
+
+         cout << "\n\n pour les descripteurs BRIEF et ORB\n";
+        cout << "\n BruteForce-Hamming";
+        cout << "\n FlannBased";
+        cout <<"\n";
+        cout <<endl;
+        
 
         exit(0);
     }
@@ -255,7 +301,9 @@ int main(int argc, char **argv)
 
     image1 = imread(argv[1], 1);
     image2 = imread(argv[2], 1);
-    String detectorName=argv[3];
+    
+
+
     //cout << "\n nom du détecteur: "<<argv[3];
 
     if(strcmp(argv[3],"MSER")==0)
@@ -341,9 +389,12 @@ int main(int argc, char **argv)
 
     else if(strcmp(argv[3],"DENSE")==0)
     {
-        DenseFeatureDetector detector(0.5);
-        detector.detect(image1, keypoints1);
-        detector.detect(image2, keypoints2);
+        Ptr<FeatureDetector> detector;
+        detector = FeatureDetector::create("Dense");
+        
+        //DenseFeatureDetector detector(0.5);
+        detector->detect(image1, keypoints1);
+        detector->detect(image2, keypoints2);
 
     }
     else if(strcmp(argv[3],"SIMPLE BLOB")==0)
@@ -385,25 +436,112 @@ int main(int argc, char **argv)
 
 
 
-    if(strcmp(argv[4],"SIFT")==0)
+    if(strcmp(argv[4],"BRIEF")==0)
     {
        
-       //SiftDescriptorExtractor siftdesc;
-       //*descriptor = siftdesc;
-      //descriptor = new SiftDescriptorExtractor(10);
-      //descriptor = DescriptorExtractor::create("SIFT");
-       //*descriptor = new DescriptorExtractor("SIFT");
-         //SiftDescriptorExtractor();
-       //descriptor=descriptorAux;
-        //descriptor = descriptorAux;
-      descriptor = cv::DescriptorExtractor::create("ORB");
-
+        descriptor = cv::DescriptorExtractor::create("BRIEF");
 
     }
+    else if(strcmp(argv[4],"ORB")==0)
+    {
+       descriptor = cv::DescriptorExtractor::create("ORB");
+
+    }
+     else if(strcmp(argv[4],"SIFT")==0)
+    {
+      
+      descriptor = cv::DescriptorExtractor::create("SIFT");
+
+    }
+    else if(strcmp(argv[4],"SURF")==0){
+
+       descriptor = cv::DescriptorExtractor::create("SURF");
+      
+    }
+
     else
     {
+
+        cout << "\n descripteur inconnu"<<endl;
+        cout << "\n liste des descripteurs possible:";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n BRIEF";
+        cout << "\n ORB";
+        cout <<"\n";
+ 
         exit(0);
     }
+  
+
+    
+        //BruteForce
+
+   //BruteForce-L1
+
+
+    /*apparieurs fonctionnant avec les descripteurs BRIEF et ORB */
+
+    //BruteForce-Hamming
+
+   //FlannBased
+
+    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
+
+
+
+       /*if(strcmp(argv[4],"BRIEF")==0 || strcmp(argv[4],"ORB")==0){
+             cout <<"\n les apparieurs disponibles pour le descripteur " << argv[4] <<" sont:";
+             cout <<"\n BruteForce-Hamming";
+             cout <<"\n FlannBased";
+             cout <<"\n"<<endl;
+
+ 	     exit(0);
+       }
+       */
+       matcher = cv::DescriptorMatcher::create(argv[5]);
+
+      // descriptor = cv::DescriptorExtractor::create(argv[4]);
+
+     
+    }
+
+   else if(strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
+
+
+        /*
+       if(strcmp(argv[4],"SIFT")==0 || strcmp(argv[4],"SURF")==0){
+             cout <<"\n les apparieurs disponibles pour le descripteur " << argv[4] <<" sont:";
+             cout <<"\n BruteForce";
+             cout <<"\n BruteForce-L1";
+             cout <<"\n"<<endl;
+
+ 	     exit(0);
+       }
+       */
+       matcher = cv::DescriptorMatcher::create(argv[5]);
+
+       //descriptor = cv::DescriptorExtractor::create(argv[4]);
+       
+      
+    }
+
+
+    else{
+        cout << "\n apparieur inconnu"<<endl;
+        cout << "\n liste des apparieurs possible:";
+        cout << "\n BruteForce";
+        cout << "\n BruteForce-L1";
+        cout << "\n BruteForce-Hamming";
+        cout << "\n FlannBased";
+        cout <<"\n";
+ 
+        exit(0);
+     
+
+    }
+
+   
 
 
 
@@ -429,13 +567,14 @@ int main(int argc, char **argv)
     */
 
     //transparency_window << "transparence " + argv[3];
-    string st1=argv[3];
-    string st2="transparence + ";
+   
+    
 
-    string st3 = st2 + argv[3];
+    string st1= argv[3] + (string)" + " +argv[4] +  (string)" + " + argv[5];
+    string st2="transparence " + st1;
 
-    transparency_window = st1;
-    matches_window= st3;
+    transparency_window = st2;
+    matches_window= st1;
 
 
 
@@ -454,20 +593,24 @@ int main(int argc, char **argv)
 
 
     Mat descriptors1, descriptors2;
+    
+        (*descriptor).compute(image1, keypoints1, descriptors1);
+        (*descriptor).compute(image2, keypoints2, descriptors2);
 
-    (*descriptor).compute(image1, keypoints1, descriptors1);
-    (*descriptor).compute(image2, keypoints2, descriptors2);
+    
 
 
 
     // Construction of the matcher
     //BruteForceMatcher< HammingLUT > matcher;
-    BruteForceMatcher < Hamming > matcher;	// =BruteForceMatcher<Hamming>(10);
+    BruteForceMatcher < Hamming > matcherHamming;	// =BruteForceMatcher<Hamming>(10);
+    BruteForceMatcher<L2<float> > matcherL2;
+    
 
     Mat descriptorAuxKp1;
-
+    descriptorAuxKp1.create(0,0,CV_8UC1);
     Mat descriptorVois;
-
+    descriptorVois.create(0,0,CV_8UC1);
     vector < int >associateIdx;
     vector < int >associateIdxVois;
 
@@ -502,7 +645,7 @@ int main(int argc, char **argv)
 
 
             //parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie(e.g 4) du keypoints en cours(ici c'est le ieme keypoint).
-            if (distance < 4)
+            if (distance < 10)
             {
 
                 //on a au moins un keypoint correspondant
@@ -550,13 +693,39 @@ int main(int argc, char **argv)
             pointsx.push_back(keypoints1[i]);
 
             //on calcule le descripteur de tous les pixels retenus comme candidat
-
+           
             (*descriptor).compute(image2, keypointsVois, descriptorVois);
 
 
 
             //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2
-            matcher.match(descriptorAuxKp1, descriptorVois, matches);
+            /*
+
+            */
+             
+           //  matcher = cv::DescriptorMatcher::create("BruteForce");
+           //  matcher = cv::DescriptorMatcher::create("BruteForce-L1");
+            // matcher = cv::DescriptorMatcher::create("BruteForce-Hamming");
+            // matcher = cv::DescriptorMatcher::create("BruteForce-Hamming(2)");
+          //   matcher = cv::DescriptorMatcher::create("FlannBased");
+
+             matcher->match(descriptorAuxKp1, descriptorVois, matches);
+        // matcherHamming.match(descriptorAuxKp1, descriptorVois, matches);
+
+            /*if( (strcmp(argv[4],"BRIEF")==0) || (strcmp(argv[4],"ORB")==0)) {
+            	//matcherHamming.match(descriptorAuxKp1, descriptorVois, matches);
+               
+                
+            }
+            else if(strcmp(argv[4],"SIFT")==0 || strcmp(argv[4],"SURF")==0){
+                matcherL2.match(descriptorAuxKp1, descriptorVois, matches);
+            
+            }
+            */
+            
+            
+
+	    
 
             //on a trouvé le keypoints qui va le mieux
             //nrmlt on a trouvé un kp
@@ -590,6 +759,11 @@ int main(int argc, char **argv)
     // position of the sorted element
     // end position
 
+    //si on veut garder les meilleurs correspondances
+
+     if(matchesWithDist.size()>500){
+       matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
+     }
 
     Mat imageMatches;
     Mat matchesMask;

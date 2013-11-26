@@ -304,7 +304,7 @@ int main(int argc, char **argv)
     
 
 
-    //cout << "\n nom du détecteur: "<<argv[3];
+    //selection du detecteur
 
     if(strcmp(argv[3],"MSER")==0)
     {
@@ -352,7 +352,7 @@ int main(int argc, char **argv)
 
     }
 
-    //different
+    //manier differente d'implementer
     else if(strcmp(argv[3],"ORB")==0)
     {
         ORB detector(200);
@@ -361,15 +361,8 @@ int main(int argc, char **argv)
 
 
     }
-    /*
-    else if(strcmp(argv[3],"BRISK")==0){
-        BRISK detector;
-        detector(image1,Mat(),keypoints1);
-        detector(image2,Mat(),keypoints2);
-
-
-    }
-    */
+    
+    
     else if(strcmp(argv[3],"HARRIS")==0)
     {
         GoodFeaturesToTrackDetector detector( 1000,0.01,1., 3,true, 0.04);
@@ -459,6 +452,14 @@ int main(int argc, char **argv)
       
     }
 
+    /*else if(strcmp(argv[4],"FREAK")==0){
+
+       descriptor = cv::DescriptorExtractor::create("FREAK");
+      
+    }*/
+
+
+
     else
     {
 
@@ -472,19 +473,6 @@ int main(int argc, char **argv)
  
         exit(0);
     }
-  
-
-    
-        //BruteForce
-
-   //BruteForce-L1
-
-
-    /*apparieurs fonctionnant avec les descripteurs BRIEF et ORB */
-
-    //BruteForce-Hamming
-
-   //FlannBased
 
     if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
 
@@ -501,7 +489,7 @@ int main(int argc, char **argv)
        */
        matcher = cv::DescriptorMatcher::create(argv[5]);
 
-      // descriptor = cv::DescriptorExtractor::create(argv[4]);
+     
 
      
     }
@@ -521,7 +509,7 @@ int main(int argc, char **argv)
        */
        matcher = cv::DescriptorMatcher::create(argv[5]);
 
-       //descriptor = cv::DescriptorExtractor::create(argv[4]);
+       
        
       
     }
@@ -541,32 +529,6 @@ int main(int argc, char **argv)
 
     }
 
-   
-
-
-
-
-
-
-
-
-
-    /*
-    char* title1 = argv[3];
-    char* title2;
-    strcpy(title2,"transparence");
-    strcat(title2,argv[3]);
-
-    matches_window=title1;
-    transparency_window=title2;
-    */
-    /*char* title1;
-    title1 = "transparence";
-    title1=title1 + argv[3];
-    transparency_window=title1;
-    */
-
-    //transparency_window << "transparence " + argv[3];
    
     
 
@@ -699,38 +661,14 @@ int main(int argc, char **argv)
 
 
             //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2
-            /*
+   
 
-            */
-             
-           //  matcher = cv::DescriptorMatcher::create("BruteForce");
-           //  matcher = cv::DescriptorMatcher::create("BruteForce-L1");
-            // matcher = cv::DescriptorMatcher::create("BruteForce-Hamming");
-            // matcher = cv::DescriptorMatcher::create("BruteForce-Hamming(2)");
-          //   matcher = cv::DescriptorMatcher::create("FlannBased");
-
-             matcher->match(descriptorAuxKp1, descriptorVois, matches);
-        // matcherHamming.match(descriptorAuxKp1, descriptorVois, matches);
-
-            /*if( (strcmp(argv[4],"BRIEF")==0) || (strcmp(argv[4],"ORB")==0)) {
-            	//matcherHamming.match(descriptorAuxKp1, descriptorVois, matches);
-               
-                
-            }
-            else if(strcmp(argv[4],"SIFT")==0 || strcmp(argv[4],"SURF")==0){
-                matcherL2.match(descriptorAuxKp1, descriptorVois, matches);
-            
-            }
-            */
-            
-            
-
-	    
+             matcher->match(descriptorAuxKp1, descriptorVois, matches);  
 
             //on a trouvé le keypoints qui va le mieux
             //nrmlt on a trouvé un kp
 
-            //cout << "\n On a trouvé " << matches.size() << " points correspondants";
+            
             KeyPoint best2 = keypointsVois[matches[0].trainIdx];
 
             pointsy.push_back(best2);
@@ -749,7 +687,7 @@ int main(int argc, char **argv)
 
 
 
-    }				//fin du for i
+    }	//fin du for i
 
 
 
@@ -799,10 +737,6 @@ int main(int argc, char **argv)
     return (0);
 }
 
-/**
- * @function cornerHarris_demo
- * @brief Executes the corner detection and draw a circle around the possible corners
- */
 void interface(int, void *)
 {
 
