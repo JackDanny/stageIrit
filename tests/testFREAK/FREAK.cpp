@@ -83,11 +83,11 @@ int main( int, char** argv )
   sift.detect(image1,keypoints1);
   sift.detect(image2,keypoints2);
 
-  //DescriptorExtractor FreakDesc;
+  DescriptorExtractor FreakDesc;
 
   //FreakDesc.create("FREAK");
   
-  FREAK FreakDesc;
+  //FREAK FreakDesc;
 
   //Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
 

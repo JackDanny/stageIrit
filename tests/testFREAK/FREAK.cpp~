@@ -87,9 +87,9 @@ int main( int, char** argv )
 
   //FreakDesc.create("FREAK");
   
-  //FREAK FreakDesc;
+  FREAK FreakDesc;
 
-  Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
+  //Ptr <DescriptorExtractor> FreakDesc;// = new DescriptorExtractor("FREAK");
 
   //DescriptorExtractor* FreakDesc = new DescriptorExtractor("FREAK");
 
