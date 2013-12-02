@@ -22,16 +22,21 @@ Mat image1, image2;
 int rows;
 int cols;
 
+
 string transparency_window;
 string matches_window;
+
+
 
 int thresh = 0;
 int max_thresh = 100;
 
 
+//seuil pour la comparaison des descripteurs
+float seuil=50;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
-int rayonDist = 7;
+int rayonDist = 15;
 
 //dans keypoints1 on a les kp de l'image de gauche auxquels 
 //on a apparié le meilleur pixel du voisinage correspondant
@@ -627,11 +632,11 @@ int main(int argc, char **argv)
 
     //matrice auxiliaire des descripteurs d'un Kp
     Mat descriptorAuxKp1;
-    descriptorAuxKp1.create(0, 0, CV_8UC1);
+    //descriptorAuxKp1.create(0, 0, CV_32FC1);
 
     //matrice des descripteurs du voisinage du Kp étudié
     Mat descriptorVois;
-    descriptorVois.create(0, 0, CV_8UC1);
+    //descriptorVois.create(0, 0, CV_32FC1);
      
 
     //pixels du voisinage d'un Kp
@@ -647,6 +652,10 @@ int main(int argc, char **argv)
 	//on a pas encore trouvé de correspondant pour kp1
 	aCorres = false;
 	//on copie la ligne i du descripteur, qui correspond aux différentes valeurs données par le descripteur pour le Keypoints[i]
+
+
+
+       // descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_8UC1);
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
 
@@ -708,12 +717,21 @@ int main(int argc, char **argv)
 	    //affiche les descripteurs
 
 	    //cout << "type" << descriptorAuxKp1.type();
+    /*descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_32FC1);
+    descriptorVois.convertTo(descriptorVois, CV_32FC1);*/
 
+   // descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_32FC1);
 /*
     string ty = type2str(descriptorAuxKp1.type());
-    printf("Matrix: %s %dx%d n", ty.c_str(), descriptorAuxKp1.cols, descriptorAuxKp1.rows);
-*/
+    string ty2 = type2str(descriptorVois.type());
 
+
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptorAuxKp1.cols, descriptorAuxKp1.rows);
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptorVois.cols, descriptorVois.rows);
+*/           
+
+            
+            //cout << descriptorAuxKp1;
 	    matcher->match(descriptorAuxKp1, descriptorVois, matches);
 
 	    //on a trouvé le keypoints qui va le mieux
@@ -793,7 +811,7 @@ pointCourant = 0;
 			KeyPoint kpVois;
 			kpVois.pt.x = p2x;
 			kpVois.pt.y = p2y;
-			kpVois.size = pointsy[0].size;
+			kpVois.size = keypoints1[0].size;
 
 			pixelsVois.push_back(kpVois);
 		    }
@@ -820,10 +838,16 @@ pointCourant = 0;
 
 	    //cout << "type" << descriptorAuxKp1.type();
 
-/*
-    string ty = type2str(descriptorAuxKp1.type());
-    printf("Matrix: %s %dx%d n", ty.c_str(), descriptorAuxKp1.cols, descriptorAuxKp1.rows);
+
+   /* string ty = type2str(descriptorAuxKp1.type());
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptorAuxKp1.cols, descriptorAuxKp1.rows);
 */
+            
+            
+
+            /*descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_32FC1);
+            descriptorVois.convertTo(descriptorVois, CV_32FC1);*/
+
 
 	    matcher->match(descriptorAuxKp1, descriptorVois, matches);
 
@@ -835,13 +859,18 @@ pointCourant = 0;
 
 	    //il nous faut comparer les points
 
-            if(best3.pt.x == pointsx[i].pt.x && best3.pt.y == pointsx[i].pt.y){
+            //if(best3.pt.x == pointsx[i].pt.x && best3.pt.y == pointsx[i].pt.y){
                 //si on est retombé sur nos pas
+            if( (abs( (best3.pt.x) - (pointsx[i].pt.x) ) <= 0.) && (abs ( (best3.pt.y) - pointsx[i].pt.y) <= 0.)){
+
                 
                 matches[0].trainIdx = pointCourant;
 	    	matches[0].queryIdx = pointCourant;
 
-                if(matches[0].distance <100){
+		//cout << endl <<matches[0].distance;
+                if(abs(matches[0].distance)< seuil){
+
+                 
                 pointsx2.push_back(best3);
                 pointsy2.push_back(pointsy[i]);
                 
@@ -996,5 +1025,6 @@ void interface(int, void *)
 
     namedWindow(transparency_window, WINDOW_AUTOSIZE);
     imshow(transparency_window, dst);
+    imwrite("trans.png", dst);
 }
 
