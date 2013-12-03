@@ -33,10 +33,10 @@ int max_thresh = 100;
 
 
 //seuil pour la comparaison des descripteurs
-float seuil=50;
+float seuil=85;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
-int rayonDist = 20;
+int rayonDist = 5;
 
 //dans keypoints1 on a les kp de l'image de gauche auxquels 
 //on a apparié le meilleur pixel du voisinage correspondant
@@ -621,7 +621,7 @@ int main(int argc, char **argv)
     imshow("image2", image2);
 
 
-
+    
 
 
 	//matrice des descripteurs des kp1
@@ -629,6 +629,7 @@ int main(int argc, char **argv)
 
     (*descriptor).compute(image1, keypoints1, descriptors1);
 
+    cout << endl <<"nb de kp:"<< keypoints1.size()<<endl;
 
     //matrice auxiliaire des descripteurs d'un Kp
     Mat descriptorAuxKp1;
@@ -658,7 +659,7 @@ int main(int argc, char **argv)
        // descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_8UC1);
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
-
+        
 
 //on supprime tous les pixels associés au keypoint1 precedent
 	pixelsVois.erase(pixelsVois.begin(), pixelsVois.end());
@@ -680,7 +681,7 @@ int main(int argc, char **argv)
 		if (p2x >= 0 && p2x < image1.rows && p2y >= 0 && p2y < image1.cols) {
 
 		    //on ne va garder que les pixels situés à une distance rayondist du point d'intérêt Pil(i)
-
+             
 		    if (distance <= rayonDist) {
 			//on a au moins un keypoint correspondant
 			aCorres = true;
@@ -788,6 +789,13 @@ pointCourant = 0;
 
 	float p1x = pointsy[i].pt.x;
 	float p1y = pointsy[i].pt.y;
+/*
+        cout << "\n le point x " <<p1x <<" y "<<p1y;
+        cout << "\n rows1 " << image1.rows;    
+        cout << "\n cols1 " << image1.cols;  
+        cout << "\n rows2 " << image2.rows;    
+        cout << "\n cols2 " << image2.cols;     
+*/
 
 	for (int x2 = -rayonDist; x2 < rayonDist + 1; x2++) {
 	    for (int y2 = -rayonDist; y2 < rayonDist + 1; y2++) {
@@ -869,7 +877,7 @@ pointCourant = 0;
 
 		//cout << endl <<matches[0].distance;
                 if(abs(matches[0].distance)< seuil){
-
+                cout << matches[0].distance;
                  
                 pointsx2.push_back(best3);
                 pointsy2.push_back(pointsy[i]);
@@ -895,7 +903,9 @@ pointCourant = 0;
 
 	}
         else{
+               
 		cout << "\n Houston on a un gros probleme \n";
+                 cout << "\n au point x " <<p1x <<" y "<<p1y;
         }
 
 
