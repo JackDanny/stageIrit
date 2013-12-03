@@ -33,10 +33,10 @@ int max_thresh = 100;
 
 
 //seuil pour la comparaison des descripteurs
-float seuil=75;
+float seuil=50;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
-int rayonDist = 5;
+int rayonDist = 50;
 
 //dans keypoints1 on a les kp de l'image de gauche auxquels 
 //on a apparié le meilleur pixel du voisinage correspondant
@@ -299,49 +299,9 @@ SimpleBlobDetector(const SimpleBlobDetector::Params ¶meters = SimpleBlobDetecto
 /// Function header
 void interface(int argc, void *);
 
-
+//fonction pour connaitre le type de donnees dans une matrice
 string type2str(int type);
 
-//fonction pour connaitre le type de donnees dans une matrice
-string type2str(int type)
-{
-    string r;
-
-    uchar depth = type & CV_MAT_DEPTH_MASK;
-    uchar chans = 1 + (type >> CV_CN_SHIFT);
-
-    switch (depth) {
-    case CV_8U:
-	r = "8U";
-	break;
-    case CV_8S:
-	r = "8S";
-	break;
-    case CV_16U:
-	r = "16U";
-	break;
-    case CV_16S:
-	r = "16S";
-	break;
-    case CV_32S:
-	r = "32S";
-	break;
-    case CV_32F:
-	r = "32F";
-	break;
-    case CV_64F:
-	r = "64F";
-	break;
-    default:
-	r = "User";
-	break;
-    }
-
-    r += "C";
-    r += (chans + '0');
-
-    return r;
-}
 
 /**
  * @function main
@@ -425,6 +385,7 @@ int main(int argc, char **argv)
     else if (strcmp(argv[3], "FAST") == 0) {
 
 	FastFeatureDetector detector(50, true);
+        //FastFeatureDetector detector;
 	detector.detect(image1, keypoints1);
 
 
@@ -626,6 +587,7 @@ int main(int argc, char **argv)
 
 	//matrice des descripteurs des kp1
     Mat descriptors1;
+  cout << endl <<"nb de kp:"<< keypoints1.size()<<endl;
 
     (*descriptor).compute(image1, keypoints1, descriptors1);
 
@@ -869,7 +831,7 @@ pointCourant = 0;
 
             //if(best3.pt.x == pointsx[i].pt.x && best3.pt.y == pointsx[i].pt.y){
                 //si on est retombé sur nos pas
-            if( (abs( (best3.pt.x) - (pointsx[i].pt.x) ) <= 0.) && (abs ( (best3.pt.y) - pointsx[i].pt.y) <= 0.)){
+            if( (abs( (best3.pt.x) - (pointsx[i].pt.x) ) <= 1.) && (abs ( (best3.pt.y) - pointsx[i].pt.y) <= 1.)){
 
                 
                 matches[0].trainIdx = pointCourant;
@@ -877,7 +839,7 @@ pointCourant = 0;
 
 		//cout << endl <<matches[0].distance;
                 if(abs(matches[0].distance)< seuil){
-                cout << matches[0].distance;
+                //cout << matches[0].distance;
                  
                 pointsx2.push_back(best3);
                 pointsy2.push_back(pointsy[i]);
@@ -922,7 +884,7 @@ pointCourant = 0;
 
 
 
-
+    cout << endl<< "nb d'appariement: " << matchesWithDist2.size() << endl;
 
 
 
@@ -1037,4 +999,46 @@ void interface(int, void *)
     imshow(transparency_window, dst);
     imwrite("trans.png", dst);
 }
+
+
+string type2str(int type)
+{
+    string r;
+
+    uchar depth = type & CV_MAT_DEPTH_MASK;
+    uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+    switch (depth) {
+    case CV_8U:
+	r = "8U";
+	break;
+    case CV_8S:
+	r = "8S";
+	break;
+    case CV_16U:
+	r = "16U";
+	break;
+    case CV_16S:
+	r = "16S";
+	break;
+    case CV_32S:
+	r = "32S";
+	break;
+    case CV_32F:
+	r = "32F";
+	break;
+    case CV_64F:
+	r = "64F";
+	break;
+    default:
+	r = "User";
+	break;
+    }
+
+    r += "C";
+    r += (chans + '0');
+
+    return r;
+}
+
 
