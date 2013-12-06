@@ -28,7 +28,7 @@ string matches_window;
 int thresh = 0;
 int max_thresh = 100;
 
-int seuil=50;
+int seuil=1000;
 
 vector < KeyPoint > keypoints1, keypoints2;
 //vector<DMatch>  matches;

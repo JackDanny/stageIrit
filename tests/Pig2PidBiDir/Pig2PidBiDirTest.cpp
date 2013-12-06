@@ -32,7 +32,7 @@ int max_thresh = 100;
 
 
 //seuil pour la comparaison des descripteurs
-float seuil=5;
+float seuil=250;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
 //int rayonDist = 100;
@@ -618,6 +618,9 @@ int main(int argc, char **argv)
 
     //nb de points reliés
     int pointCourant = 0;
+    descriptors1.convertTo(descriptors1, CV_32FC1);
+    descriptors2.convertTo(descriptors2, CV_32FC1); 
+
 
     for (int i = 0; i < keypoints1.size(); i++) {
 	
@@ -635,10 +638,26 @@ int main(int argc, char **argv)
 
 	float p1x = keypoints1[i].pt.x;
 	float p1y = keypoints1[i].pt.y;
-       
+     /*   string ty = type2str(descriptors1.type());
+        string ty2 = type2str(descriptors2.type());
+
+        printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
+    	printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors2.cols, descriptors2.rows);*/
+
+      
+
+  	
         matcher->match(descriptorAuxKp1, descriptors2, matches);
  
         pointsx.push_back(keypoints1[i]);
+
+/*
+        ty = type2str(descriptors1.type());
+        ty2 = type2str(descriptors2.type());
+       
+         printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
+         printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors2.cols, descriptors2.rows);
+*/
 
         //on a trouvé le keypoints qui va le mieux
 	//nrmlt on a trouvé un kp
@@ -683,6 +702,8 @@ pointCourant = 0;
 //attention on calcule les descripteurs de l'image 2
  (*descriptor).compute(image2, pointsy, descriptors2Aux);
 
+descriptors2Aux.convertTo(descriptors2Aux, CV_32FC1);
+
  for (int i = 0; i < pointsy.size(); i++) {
 
 	//on copie la ligne i du descripteur, qui correspond aux différentes valeurs données par le descripteur pour le pointsy[i]
@@ -698,7 +719,9 @@ pointCourant = 0;
             //attention ce sont les descripteurs de image1*/
 
 	    (*descriptor).compute(image1, pointsx, descriptorAuxPtsx);
-
+            //descriptors1.convertTo(descriptorAuxKp1, CV_32FC1);
+ 	    //descriptors2.convertTo(descriptorAuxPtsx, CV_32FC1); 
+            descriptorAuxPtsx.convertTo(descriptorAuxPtsx, CV_32FC1);
             
 	    matcher->match(descriptorAuxKp1, descriptorAuxPtsx, matches);
 

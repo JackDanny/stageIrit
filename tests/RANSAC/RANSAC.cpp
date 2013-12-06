@@ -25,6 +25,9 @@ Mat image1, image2;
 string transparency_window;
 string matches_window;
 
+     static vector<Point2f> obj;
+     static vector<Point2f> scene;
+     static vector<Point2f> scene_corners;
 
 
 int thresh = 0;
@@ -32,7 +35,7 @@ int max_thresh = 100;
 
 
 //seuil pour la comparaison des descripteurs
-float seuil=5;
+float seuil=0.5;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
 //int rayonDist = 100;
@@ -735,9 +738,25 @@ pointCourant = 0;
 
 /*********************************************************************************************/
 
+//utilisation de RANSAC
+
+     cout << pointsx2.size()<<endl;
+     cout << pointsy2.size()<<endl;
+
+     
+
+     for(int i=0;i<pointsx2.size();i++){
+         obj.push_back(pointsx2[i].pt);
+         scene.push_back(pointsy2[i].pt);
+
+     }
 
 
-
+     Mat H = findHomography( obj,  scene, CV_RANSAC );
+  
+    
+    
+     perspectiveTransform( obj, scene_corners, H);
 
 
 
@@ -745,7 +764,7 @@ pointCourant = 0;
 
     cout << endl<< "nb d'appariement: " << matchesWithDist2.size() << endl;
 
-
+   cout <<endl << "pb" << endl;
 
 
 //ici on trie les matchesWithDist2 par distance des valeurs des descripteurs et non par distance euclidienne
@@ -826,13 +845,13 @@ void interface(int, void *)
     vector < KeyPoint > keypointsKeep1, keypointsKeep2;
 
 
-    for (int i = 0; i < matchesWithDist2.size(); i++) {
+    for (int i = 0; i < obj.size(); i++) {
 
 
-	kp1x = pointsx2[matchesWithDist2[i].queryIdx].pt.x;
-	kp1y = pointsx2[matchesWithDist2[i].queryIdx].pt.y;
-	kp2x = pointsy2[matchesWithDist2[i].trainIdx].pt.x;
-	kp2y = pointsy2[matchesWithDist2[i].trainIdx].pt.y;
+	kp1x = obj[i].x;
+	kp1y = obj[i].y;
+	kp2x = scene_corners[i].x;
+	kp2y = scene_corners[i].y;
 
 	kptx = kp1x * (100. - thresh) / 100. + kp2x * (thresh / 100.);
 	kpty = kp1y * (100. - thresh) / 100. + kp2y * (thresh / 100.);

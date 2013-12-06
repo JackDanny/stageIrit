@@ -28,7 +28,7 @@ string matches_window;
 int thresh = 0;
 int max_thresh = 100;
 
-int seuil=100;
+int seuil=110;
 
 vector < KeyPoint > keypoints1, keypoints2;
 //vector<DMatch>  matches;
@@ -245,6 +245,8 @@ void interface(int argc, void *);
  * @function main
  */
 
+//fonction pour connaitre le type de donnees dans une matrice
+string type2str(int type);
 
 
 int main(int argc, char **argv)
@@ -541,12 +543,25 @@ int main(int argc, char **argv)
     (*descriptor).compute(image1, keypoints1, descriptors1);
     (*descriptor).compute(image2, keypoints2, descriptors2);
 
-    
-     
+    string ty = type2str(descriptors1.type());
+    string ty2 = type2str(descriptors2.type());
+
+
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors2.cols, descriptors2.rows);
+
+    descriptors1.convertTo(descriptors1, CV_32FC1);
+    descriptors2.convertTo(descriptors2, CV_32FC1); 
     matcher->match(descriptors1, descriptors2, matches);
+
+    ty = type2str(descriptors1.type());
+    ty2 = type2str(descriptors2.type());
        
-             
-            
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors2.cols, descriptors2.rows);
+
+   // descriptors1.convertTo(descriptors1, CV_8UC1);
+   // descriptors2.convertTo(descriptors2, CV_8UC1); 
 
 
 //ici on trie les matchesWithDist par distance des valeurs des descripteurs et non par distance euclidienne
@@ -554,6 +569,9 @@ int main(int argc, char **argv)
     // initial position
     // position of the sorted element
     // end position
+
+   
+
 
     for(int i=0;i<matches.size();i++){
  	if(matches[i].distance>seuil){
@@ -665,4 +683,45 @@ void interface(int, void *)
     namedWindow(transparency_window, WINDOW_AUTOSIZE);
     imshow(transparency_window, dst);
 }
+
+string type2str(int type)
+{
+    string r;
+
+    uchar depth = type & CV_MAT_DEPTH_MASK;
+    uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+    switch (depth) {
+    case CV_8U:
+	r = "8U";
+	break;
+    case CV_8S:
+	r = "8S";
+	break;
+    case CV_16U:
+	r = "16U";
+	break;
+    case CV_16S:
+	r = "16S";
+	break;
+    case CV_32S:
+	r = "32S";
+	break;
+    case CV_32F:
+	r = "32F";
+	break;
+    case CV_64F:
+	r = "64F";
+	break;
+    default:
+	r = "User";
+	break;
+    }
+
+    r += "C";
+    r += (chans + '0');
+
+    return r;
+}
+
 
