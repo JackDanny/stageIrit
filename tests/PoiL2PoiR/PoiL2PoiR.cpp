@@ -19,7 +19,6 @@ using namespace std;
 ///Matrix of the two images
 Mat image1, image2;
 
-
 ///name of the window with a trackbar
 string transparency_window;
 
@@ -44,17 +43,24 @@ vector < KeyPoint > keypoints1, keypoints2;
 vector < DMatch > matches;
 
 
+
+
+
+
+
+
+
+
 /// Function header
 
 ///For display the window with trackbar
 ///it's a callback fonction call each time we move the cursor of the trackbar
 void interface(int argc, void *);
 
-
-
 /**
  * @function main
  */
+
 int main(int argc, char **argv)
 {
 

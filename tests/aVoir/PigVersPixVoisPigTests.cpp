@@ -1,32 +1,45 @@
 #include <opencv2/opencv.hpp>
-
-#include <iostream>
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/nonfree/features2d.hpp"
-#include <opencv2/legacy/legacy.hpp>
-#include "opencv2/core/mat.hpp"
-
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <opencv2/legacy/legacy.hpp>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/mat.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 
 using namespace cv;
 using namespace std;
 
 /// Global variables
-Mat image1, image2;
-int rows;
-int cols;
 
+///Matrix of the two images
+Mat image1, image2;
+
+///name of the window with a trackbar
 string transparency_window;
+
+
 string matches_window;
 
 int thresh = 0;
 int max_thresh = 100;
+
+
+
+/*rayon autour duquel on cherche un kp2 autour d'un kp1*/
+int rayonDist = 5;
+/*rayon du cercle ou du carré dans lequel on va regarder tous les pixels quand
+ *on a trouvé un kp2 correspondant à un kp1
+ */
+
+
+int rayonVois = 1;
+
+
 
 
 vector < KeyPoint > keypoints1, keypoints2, pointsx, pointsy;
@@ -209,11 +222,49 @@ SimpleBlobDetector(const SimpleBlobDetector::Params &parameters = SimpleBlobDete
 
 //SIFT
 
+/*
+ * SiftDescriptorExtractor (
+     double magnification, 
+     bool isNormalize = true, 
+     bool recalculateAngles = true,
+     int nOctaves=SIFT::CommonParams::DEFAULT_NOCTAVES, 
+     int nOctaveLayers=SIFT::CommonParams::DEFAULT_NOCTAVE_LAYERS, 
+     int firstOctave=SIFT::CommonParams::DEFAULT_FIRST_OCTAVE, 
+     int angleMode=SIFT::CommonParams::FIRST_ANGLE
+)
+ *
+ *mais on a:
+ *SIFT(int nfeatures=0,
+       int nOctaveLayers=3,
+       double contrastThreshold=0.04,
+       double edgeThreshold=10, 
+       double sigma=1.6) 
+ */
+
 //SURF
 
-//BRIEF
+/*
+ * SurfDescriptorExtractor (int nOctaves=4, int nOctaveLayers=2, bool extended=false)
+ * 
+ * mais on a:
+ *
+ *SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=false, bool upright=false)
+ */
 
+
+//BRIEF
+/*
+ *
+ *cv::BriefDescriptorExtractor::BriefDescriptorExtractor ( int bytes = 32 ) 
+ *
+ * // bytes is a length of descriptor in bytes. It can be equal 16, 32 or 64 bytes. 
+ */
 //ORB
+/*
+ *OrbDescriptorExtractor( ORB::PatchSize patch_size );
+ *
+ */
+
 
 
 
@@ -241,6 +292,32 @@ SimpleBlobDetector(const SimpleBlobDetector::Params &parameters = SimpleBlobDete
 /// Function header
 void interface(int argc, void *);
 
+
+string type2str(int type);
+
+
+string type2str(int type) {
+  string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch ( depth ) {
+    case CV_8U:  r = "8U"; break;
+    case CV_8S:  r = "8S"; break;
+    case CV_16U: r = "16U"; break;
+    case CV_16S: r = "16S"; break;
+    case CV_32S: r = "32S"; break;
+    case CV_32F: r = "32F"; break;
+    case CV_64F: r = "64F"; break;
+    default:     r = "User"; break;
+  }
+
+  r += "C";
+  r += (chans+'0');
+
+  return r;
+}
 /**
  * @function main
  */
@@ -250,7 +327,7 @@ void interface(int argc, void *);
 int main(int argc, char **argv)
 {
 
-  
+   
    Ptr<DescriptorExtractor> descriptor;  
    Ptr<DescriptorMatcher> matcher;
    
@@ -299,8 +376,8 @@ int main(int argc, char **argv)
 
 
 
-    image1 = imread(argv[1], 1);
-    image2 = imread(argv[2], 1);
+    image1 = imread(argv[1],1);
+    image2 = imread(argv[2],1);
     
 
 
@@ -308,24 +385,36 @@ int main(int argc, char **argv)
 
     if(strcmp(argv[3],"MSER")==0)
     {
+        /*
+        MSER* detector = new MSER();
+        
+        //(*detector)(image1,Mat(),keypoints1);
+        //(*detector)(image2,Mat(),keypoints2);
+        */
+        
         MserFeatureDetector detector;
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
-
+        
 
     }
 
 
     else if(strcmp(argv[3],"FAST")==0)
     {
-        FastFeatureDetector detector(50,true);
+        
+       FastFeatureDetector detector(50,true);
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
+        
+        
     }
 
 
     else if(strcmp(argv[3],"STAR")==0)
     {
+
+          
         StarFeatureDetector detector;
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
@@ -336,30 +425,46 @@ int main(int argc, char **argv)
 
     else if(strcmp(argv[3],"SIFT")==0)
     {
+        
         SiftFeatureDetector detector;
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
-
+        
+        /*
+        SIFT detector;
+        detector(image1,Mat(),keypoints1);
+        detector(image2,Mat(),keypoints2);
+        */
 
     }
 
     else if(strcmp(argv[3],"SURF")==0)
     {
-        SurfFeatureDetector detector(2000);
+        
+        SurfFeatureDetector detector;
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
-
+        
+        /*
+        SURF detector(100);
+        detector(image1,Mat(),keypoints1);
+        detector(image2,Mat(),keypoints2);
+        */
 
     }
 
-    //manier differente d'implementer
+    //maniere differente d'implementer
     else if(strcmp(argv[3],"ORB")==0)
     {
         ORB detector(200);
         detector(image1,Mat(),keypoints1);
         detector(image2,Mat(),keypoints2);
-
-
+        
+        /*
+        OrbFeatureDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+        */
     }
     
     
@@ -405,6 +510,8 @@ int main(int argc, char **argv)
         detector.detect(image2,keypoints2);
 
     }
+
+   
     else
     {
 
@@ -432,31 +539,40 @@ int main(int argc, char **argv)
     if(strcmp(argv[4],"BRIEF")==0)
     {
        
-        descriptor = cv::DescriptorExtractor::create("BRIEF");
+        //descriptor = cv::DescriptorExtractor::create("BRIEF");
+        descriptor = new BriefDescriptorExtractor(64);
+
 
     }
     else if(strcmp(argv[4],"ORB")==0)
     {
-       descriptor = cv::DescriptorExtractor::create("ORB");
+       //descriptor = cv::DescriptorExtractor::create("ORB");
+      descriptor = new OrbDescriptorExtractor();
 
     }
      else if(strcmp(argv[4],"SIFT")==0)
     {
+      descriptor = new SiftDescriptorExtractor();
       
-      descriptor = cv::DescriptorExtractor::create("SIFT");
+      //descriptor = cv::DescriptorExtractor::create("SIFT");
 
     }
     else if(strcmp(argv[4],"SURF")==0){
 
-       descriptor = cv::DescriptorExtractor::create("SURF");
-      
+       //descriptor = cv::DescriptorExtractor::create("SURF");
+
+       descriptor = new SurfDescriptorExtractor();
+
     }
 
-    /*else if(strcmp(argv[4],"FREAK")==0){
+    /*else if(strcmp(argv[4],"CALONDER")==0){
 
-       descriptor = cv::DescriptorExtractor::create("FREAK");
-      
-    }*/
+       //descriptor = cv::DescriptorExtractor::create("SURF");
+
+       descriptor = new CalonderDescriptorExtractor<float>();
+
+    }
+    */
 
 
 
@@ -474,47 +590,13 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
+    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0 || strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
+    matcher = cv::DescriptorMatcher::create(argv[5]);
 
-
-
-       /*if(strcmp(argv[4],"BRIEF")==0 || strcmp(argv[4],"ORB")==0){
-             cout <<"\n les apparieurs disponibles pour le descripteur " << argv[4] <<" sont:";
-             cout <<"\n BruteForce-Hamming";
-             cout <<"\n FlannBased";
-             cout <<"\n"<<endl;
-
- 	     exit(0);
-       }
-       */
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-
-     
 
      
     }
-
-   else if(strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
-
-
-        /*
-       if(strcmp(argv[4],"SIFT")==0 || strcmp(argv[4],"SURF")==0){
-             cout <<"\n les apparieurs disponibles pour le descripteur " << argv[4] <<" sont:";
-             cout <<"\n BruteForce";
-             cout <<"\n BruteForce-L1";
-             cout <<"\n"<<endl;
-
- 	     exit(0);
-       }
-       */
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-
-       
-       
-      
-    }
-
-
+ 
     else{
         cout << "\n apparieur inconnu"<<endl;
         cout << "\n liste des apparieurs possible:";
@@ -539,11 +621,6 @@ int main(int argc, char **argv)
     matches_window= st1;
 
 
-
-    rows = image1.rows;
-    cols = image1.cols;
-
-
     namedWindow("image1", WINDOW_AUTOSIZE);
     imshow("image1", image1);
     namedWindow("image2", WINDOW_AUTOSIZE);
@@ -559,14 +636,6 @@ int main(int argc, char **argv)
         (*descriptor).compute(image1, keypoints1, descriptors1);
         (*descriptor).compute(image2, keypoints2, descriptors2);
 
-    
-
-
-
-    // Construction of the matcher
-    //BruteForceMatcher< HammingLUT > matcher;
-    BruteForceMatcher < Hamming > matcherHamming;	// =BruteForceMatcher<Hamming>(10);
-    BruteForceMatcher<L2<float> > matcherL2;
     
 
     Mat descriptorAuxKp1;
@@ -607,7 +676,7 @@ int main(int argc, char **argv)
 
 
             //parmis les valeurs dans descriptors2 on ne va garder que ceux dont les keypoints associés sont à une distance définie(e.g 4) du keypoints en cours(ici c'est le ieme keypoint).
-            if (distance < 10)
+            if (distance < rayonDist)
             {
 
                 //on a au moins un keypoint correspondant
@@ -615,10 +684,10 @@ int main(int argc, char **argv)
                 KeyPoint kpVois;
 
                 //on rajoute les pixels du 9 voisinage dans la liste des keypoints2 à matcher
-                for (float ivois = -1; ivois < 2; ivois++)
+                for (float ivois = -rayonVois; ivois < rayonVois+1; ivois++)
                 {
 
-                    for (float jvois = -1; jvois < 2; jvois++)
+                    for (float jvois = -rayonVois; jvois < rayonVois+1; jvois++)
                     {
 
 
@@ -628,11 +697,31 @@ int main(int argc, char **argv)
                         kpVois.size = keypoints1[0].size;
 
                         //il faut que les coordonnes du point en question soient contenus dans l'image
+
+
                         if (kpVois.pt.x >= 0 && kpVois.pt.x < image1.rows
                                 && kpVois.pt.y >= 0 && kpVois.pt.y < image1.cols)
                         {
 
-                            keypointsVois.push_back(kpVois);
+                            
+                           //si on veut décrire un cercle
+                           //if(sqrt(pow(ivois,2)+pow(jvois,2)) < rayonVois){
+
+                             //       keypointsVois.push_back(kpVois);
+                                   /* image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[0] = 0;
+                                    image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[1] = 0;
+                                    image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[2] = 0;*/
+
+
+                           //}
+			   //ou un carre
+                           /*image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[0] = 0;
+                                    image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[1] = 0;
+                                    image1.at < cv::Vec3b > (kpVois.pt.y,kpVois.pt.x)[2] = 0;
+                           */
+                           keypointsVois.push_back(kpVois);
+                           
+
 
                         }
                     }
@@ -662,7 +751,15 @@ int main(int argc, char **argv)
 
             //ici on ne matche qu'un keypoints de l'image1 avec le meilleur des keypoints gardés de l'image 2
    
+		//affiche les descripteurs
 
+             //cout << "type" << descriptorAuxKp1.type();
+
+
+         string ty =  type2str( descriptorAuxKp1.type() );
+         printf("Matrix: %s %dx%d \n", ty.c_str(), descriptorAuxKp1.cols, descriptorAuxKp1.rows );
+
+           
              matcher->match(descriptorAuxKp1, descriptorVois, matches);  
 
             //on a trouvé le keypoints qui va le mieux
@@ -698,10 +795,11 @@ int main(int argc, char **argv)
     // end position
 
     //si on veut garder les meilleurs correspondances
-
+/*
      if(matchesWithDist.size()>500){
        matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
      }
+*/
 
     Mat imageMatches;
     Mat matchesMask;
@@ -744,9 +842,9 @@ void interface(int, void *)
     image1.copyTo(dst);
 
     ///on adapte l'importance des pixels de chaque image selon la valeur du trackbar
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < image1.rows; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < image1.cols; j++)
         {
 
             dst.at < cv::Vec3b > (i, j)[0] = (float) (image2.at < cv::Vec3b > (i, j)[0]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[0]) * (float) ((100. - thresh) / 100.);
