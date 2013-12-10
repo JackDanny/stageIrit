@@ -4,10 +4,8 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/nonfree/features2d.hpp"
 #include <opencv2/legacy/legacy.hpp>
 #include "opencv2/core/mat.hpp"
-
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
@@ -18,9 +16,10 @@ using namespace cv;
 using namespace std;
 
 /// Global variables
+
 Mat image1, image2;
-int rows;
-int cols;
+
+
 
 string transparency_window;
 string matches_window;
@@ -607,9 +606,9 @@ void interface(int, void *)
     image1.copyTo(dst);
 
     ///on adapte l'importance des pixels de chaque image selon la valeur du trackbar
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < image1.rows; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < image1.cols; j++)
         {
 
             dst.at < cv::Vec3b > (i, j)[0] = (float) (image2.at < cv::Vec3b > (i, j)[0]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[0]) * (float) ((100. - thresh) / 100.);

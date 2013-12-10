@@ -1,0 +1,501 @@
+#include <opencv2/opencv.hpp>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <opencv2/legacy/legacy.hpp>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/mat.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+
+using namespace cv;
+using namespace std;
+
+/// Global variables
+
+///Matrix of the two images
+Mat image1, image2;
+
+
+///name of the window with a trackbar
+string transparency_window;
+
+///name of the window with the two images, their KeyPoints and their matches
+string matches_window;
+
+///initial value of the thresh at the begining at the launching of the interface
+int thresh = 0;
+
+///value max of the trackbar
+int max_thresh = 100;
+
+///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
+///the evaluation of similarity between two points.
+int threshMatches=50;
+
+///keypoints1 correspond to keypoints detected in the 1st image
+///keypoints2 correspond to keypoints detected in the 2nd image
+vector < KeyPoint > keypoints1, keypoints2;
+
+///vector of the matches of keypoints
+vector < DMatch > matches;
+
+
+/// Function header
+
+///For display the window with trackbar
+///it's a callback fonction call each time we move the cursor of the trackbar
+void interface(int argc, void *);
+
+
+
+/**
+ * @function main
+ */
+int main(int argc, char **argv)
+{
+
+   
+   Ptr<DescriptorExtractor> descriptor;  
+   Ptr<DescriptorMatcher> matcher;
+   
+   ///checking the number of argument
+   if(argc!=6)
+   {
+        cout << "\nusage incorrect!\n\n";
+        cout << "pathimage1 pathimage2 detectorName descriptorName matcherName\n" <<endl;
+
+        cout << "\n detectorName List:";
+        cout << "\n MSER";
+        cout << "\n FAST";
+        cout << "\n STAR";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n ORB";
+        cout << "\n HARRIS";
+        cout << "\n GFTT";
+        cout << "\n DENSE";
+        cout << "\n SIMPLE BLOB\n";
+        cout << endl;
+
+        cout << "\n descriptorName List:";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n BRIEF";
+        cout << "\n ORB";
+        cout << endl;
+
+        cout << "\n matcherName List:";
+
+        cout << "\n BruteForce";
+        cout << "\n BruteForce-L1";
+        cout << "\n BruteForce-Hamming";
+        cout << "\n FlannBased";
+        cout <<"\n";
+        cout <<endl;
+        
+
+        exit(0);
+    }
+
+
+
+    image1 = imread(argv[1], 1);
+	///checking pathimage1 exist
+    if(! image1.data)
+    {
+        cout << endl << endl;
+        cout <<"error: in"<<endl;
+        cout <<argv[0];
+        cout << " pathimage1 pathimage2 detectorName descriptorName matcherName\n" <<endl;
+	cout << endl << "argument pathimage1 \""<< argv[1] << "\" is not valid";
+        cout << endl;
+        exit(-1);
+    }
+
+    image2 = imread(argv[2], 1);
+	///checking pathimage2 exist
+     if(! image2.data)
+    {
+        cout << endl << endl;
+        cout <<"error: in"<<endl;
+        cout <<argv[0];
+        cout << " pathimage1 pathimage2 detectorName descriptorName matcherName\n" <<endl;
+	cout << endl << "argument pathimage2 \""<< argv[2] << "\" is not valid";
+        cout << endl;
+        exit(-1);
+    }
+    
+    ///selection of the detector in function of argv[3]
+    if(strcmp(argv[3],"MSER")==0)
+    {
+        MserFeatureDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+    }
+
+
+    else if(strcmp(argv[3],"FAST")==0)
+    {
+        FastFeatureDetector detector(50,true);
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+    }
+
+
+    else if(strcmp(argv[3],"STAR")==0)
+    {
+        StarFeatureDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+    }
+
+
+    else if(strcmp(argv[3],"SIFT")==0)
+    {
+        SiftFeatureDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+    }
+
+    else if(strcmp(argv[3],"SURF")==0)
+    {
+        SurfFeatureDetector detector(2000);
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+    }
+
+    else if(strcmp(argv[3],"ORB")==0)
+    {
+        ORB detector(200);
+        detector(image1,Mat(),keypoints1);
+        detector(image2,Mat(),keypoints2);
+
+
+    }
+   
+    else if(strcmp(argv[3],"HARRIS")==0)
+    {
+        GoodFeaturesToTrackDetector detector( 1000,0.01,1., 3,true, 0.04);
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+
+
+    }
+    else if(strcmp(argv[3],"GFTT")==0)
+    {
+        GoodFeaturesToTrackDetector detector;
+        detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
+
+    }
+
+    else if(strcmp(argv[3],"DENSE")==0)
+    {
+        Ptr<FeatureDetector> detector;
+        detector = FeatureDetector::create("Dense");
+        
+	///other usage:
+        //DenseFeatureDetector detector(0.5);
+        detector->detect(image1, keypoints1);
+        detector->detect(image2, keypoints2);
+
+    }
+    else if(strcmp(argv[3],"SIMPLE BLOB")==0)
+    {
+        cv::SimpleBlobDetector::Params params;
+        params.minDistBetweenBlobs = 10.0;  // minimum 10 pixels between blobs
+        params.filterByArea = true;         // filter my blobs by area of blob
+        params.minArea = 10.0;              // min 20 pixels squared
+        params.maxArea = 500.0;             // max 500 pixels squared
+        SimpleBlobDetector detector(params);
+
+        detector.detect(image1,keypoints1);
+        detector.detect(image2,keypoints2);
+
+    }
+
+    ///checking detector
+    else
+    {
+
+        cout << "\n detector unknow"<<endl;
+        cout << "\n detectors valid list:";
+        cout << "\n MSER";
+        cout << "\n FAST";
+        cout << "\n STAR";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n ORB";
+        cout << "\n HARRIS";
+        cout << "\n GFTT";
+        cout << "\n DENSE";
+        cout << "\n SIMPLE BLOB";
+        cout <<"\n";
+        exit(-1);
+    }
+
+
+    //descriptor/extractor selection in function of argv[4]
+
+    if(strcmp(argv[4],"BRIEF")==0)
+    {
+       
+        descriptor = cv::DescriptorExtractor::create("BRIEF");
+
+    }
+    else if(strcmp(argv[4],"ORB")==0)
+    {
+       descriptor = cv::DescriptorExtractor::create("ORB");
+
+    }
+     else if(strcmp(argv[4],"SIFT")==0)
+    {
+      
+      descriptor = cv::DescriptorExtractor::create("SIFT");
+
+    }
+    else if(strcmp(argv[4],"SURF")==0){
+
+       descriptor = cv::DescriptorExtractor::create("SURF");
+      
+    }
+
+    ///checking of descriptor
+    else
+    {
+
+        cout << "\n descriptor/extractor unknow"<<endl;
+        cout << "\n descriptor/extractor valid list:";
+        cout << "\n SIFT";
+        cout << "\n SURF";
+        cout << "\n BRIEF";
+        cout << "\n ORB";
+        cout <<"\n";
+ 
+        exit(-1);
+    }
+    
+     ///selection of matcher in function of argv[5]
+     ///Be careful with the type of data of members of the descriptors matrix and the type of
+     ///data valid by the matcher. Commons confusion are due to CV_8UC1 and CV_32FC1 
+    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
+
+       matcher = cv::DescriptorMatcher::create(argv[5]);
+     
+    }
+
+   else if(strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
+
+       matcher = cv::DescriptorMatcher::create(argv[5]);
+      
+    }
+
+    ///checking for the matcher
+    else{
+        cout << "\n matcher unknow"<<endl;
+        cout << "\n matcher valid list:";
+        cout << "\n BruteForce";
+        cout << "\n BruteForce-L1";
+        cout << "\n BruteForce-Hamming";
+        cout << "\n FlannBased";
+        cout <<"\n";
+ 
+        exit(-1);
+     
+
+    }
+ 
+
+    ///part of title of the windows composed by detector+descriptor+matcher,
+    ///for know what is what
+    string st1= argv[3] + (string)" + " +argv[4] +  (string)" + " + argv[5];
+    string st2="transparence " + st1;
+    
+    transparency_window = st2;
+    matches_window= st1;
+
+    ///Displaying of the two images
+    namedWindow("image1", WINDOW_AUTOSIZE);
+    imshow("image1", image1);
+    namedWindow("image2", WINDOW_AUTOSIZE);
+    imshow("image2", image2);
+
+    ///descriptors computation	
+    ///the descriptors has one index corresponding to the number of the keypoint (his place in the vector)
+    ///and the other index for the value of one component of the vector used by the descriptor
+    ///algorithm
+    Mat descriptors1, descriptors2;
+    
+    (*descriptor).compute(image1, keypoints1, descriptors1);
+    (*descriptor).compute(image2, keypoints2, descriptors2);
+
+    
+    ///We matches the keypoints
+    ///in matches are connected the keypoints with their index in the vector 
+    matcher->match(descriptors1, descriptors2, matches);
+       
+             
+            
+
+
+    ///matches are sorted with the help of the definition of the operator "<". Here it 
+    ///means with the distanceMatching value. Indeed, a DMatch has a field distance
+
+    nth_element(matches.begin(), matches.begin(), matches.end());
+    /// initial position
+    /// position of the sorted element (it has only an effect about the running time)
+    /// end position
+
+    for(int i=0;i<matches.size();i++){
+	///when the quality of the matching become unsatisfactory, we eliminate all others matches
+ 	if(matches[i].distance>threshMatches){
+
+		matches.erase(matches.begin() + i,matches.end());
+
+        }
+    }
+
+
+    //if we want to keep only some matches
+    /* if(matches.size()>500){
+       matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
+     }*/
+
+    ///the matrix composed by the two images, the keypoints1 and keypoints2
+    ///the matches are colored, the keypoints no matched are white
+    ///the image is often hard to interpret due to the great number of element to display
+
+    Mat imageMatches;
+    
+    drawMatches(image1, keypoints1,	// 1st image and its keypoints
+                image2, keypoints2,	// 2nd image and its keypoints
+                matches,	// the matches
+                imageMatches,	// the image produced
+                Scalar::all(-1),	// color of the lines (random color)
+                Scalar(255, 255, 255)	//color of the keypoints (white)
+               );
+
+    ///we display the result and we create a image png named "result" in the local repository 
+    namedWindow(matches_window, CV_WINDOW_AUTOSIZE);
+    imshow(matches_window, imageMatches);
+    imwrite("result.png", imageMatches);
+
+   
+
+    /// Create a window with a trackbar
+    namedWindow(transparency_window, WINDOW_AUTOSIZE);
+
+    ///each time we move the trackbar cursor, the value of thresh change and
+    ///the fonction interface is call back
+    createTrackbar("Threshold: ", transparency_window, &thresh, max_thresh, interface);
+
+    ///interface is a recursive function allowing to use the trackbar
+    interface(0, 0);
+
+    ///We wait that the users press a key
+    waitKey(0);
+    return (0);
+}
+
+
+
+void interface(int, void *)
+{
+
+    ///Matrix destination of the image we want to display
+    Mat dst;
+    
+    ///at the begining we see the image1
+    image1.copyTo(dst);
+
+    ///With the use of the cursor of the trackbar (value of thresh), we give weight to
+    ///pixels of each image with help of linear interpolation
+    for (int i = 0; i < image1.rows; i++)
+    {
+        for (int j = 0; j < image1.cols; j++)
+        {
+
+            dst.at < cv::Vec3b > (i, j)[0] = (float) (image2.at < cv::Vec3b > (i, j)[0]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[0]) * (float) ((100. - thresh) / 100.);
+            dst.at < cv::Vec3b > (i, j)[1] = (float) (image2.at < cv::Vec3b > (i, j)[1]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[1]) * (float) ((100. - thresh) / 100.);
+            dst.at < cv::Vec3b > (i, j)[2] = (float) (image2.at < cv::Vec3b > (i, j)[2]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[2]) * (float) ((100. - thresh) / 100.);
+
+
+        }
+    }
+    ///coordonates of KeyPoint1 (image 1)
+    float kp1x;
+    float kp1y;
+
+    ///coordonates of KeyPoint2 (image 2)
+    float kp2x;
+    float kp2y;
+
+    //coordonates of KeyPoint (image dst)
+    float kptx;
+    float kpty;
+
+   
+
+    
+    for (int i = 0; i < matches.size(); i++)
+    {
+	///we calculate the coordonates of the two points to matched
+        kp1x = keypoints1[matches[i].queryIdx].pt.x;
+        kp1y = keypoints1[matches[i].queryIdx].pt.y;
+
+        kp2x = keypoints2[matches[i].trainIdx].pt.x;
+        kp2y = keypoints2[matches[i].trainIdx].pt.y;
+
+	//and we calculate the position of the point to display in the dst image
+        //by linear interpolation with the help of thresh
+        kptx = kp1x * (100. - thresh) / 100. + kp2x * (thresh / 100.);
+        kpty = kp1y * (100. - thresh) / 100. + kp2y * (thresh / 100.);
+
+        Point ptkp1 = Point(kptx, kpty);
+
+	///we use RGB with one Byte for each color. So the number of color is...
+        int nbColor = 256 * 256 * 256;
+
+	///we have matches.size() point to display. So:
+        int ColStep = nbColor / matches.size();
+	///We can also divided by matches.size()-1 because point 0 to matches.size()-1, 
+        ///but if matches.size()==1, it is not cool
+
+        ///colActu is a value used for calculate the color of the point corresponding to
+        ///the matches number i
+        int colActu = ColStep * i;
+
+        ///value of blue component
+        int blue = colActu % 256;
+
+        int qb = colActu / 256;
+
+	//guess
+        int green = qb % 256;
+	
+	
+        int red = qb / 256;
+
+	
+	//so we draw the point
+        circle(dst, ptkp1, 5, Scalar(red, green, blue), 2, 8, 0);
+    }
+
+    //and we display the beautiful colored window
+    namedWindow(transparency_window, WINDOW_AUTOSIZE);
+    imshow(transparency_window, dst);
+}
+
