@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( PoiL2PixInNePoiLBidir )
+find_package( OpenCV REQUIRED )
+add_executable( PoiL2PixInNePoiLBidir PoiL2PixInNePoiLBidir.cpp )
+target_link_libraries( PoiL2PixInNePoiLBidir ${OpenCV_LIBS} )
