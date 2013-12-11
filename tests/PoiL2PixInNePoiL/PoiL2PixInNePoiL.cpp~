@@ -41,7 +41,7 @@ int threshMatches=50;
 vector < KeyPoint > keypoints1, pointsx, pointsy;
 
 //distance of the neighborhood were we search pixels to matched, it's an EuclidianDistance
-int EucDist=30;
+int EucDist=10;
 
 ///vector of the matches of one keypoint.
 vector < DMatch > matches;
