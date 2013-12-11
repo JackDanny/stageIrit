@@ -1,24 +1,25 @@
 #include <opencv2/opencv.hpp>
-
-#include <iostream>
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/nonfree/features2d.hpp"
-#include <opencv2/legacy/legacy.hpp>
-#include "opencv2/core/mat.hpp"
-
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <opencv2/legacy/legacy.hpp>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/mat.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 
 using namespace cv;
 using namespace std;
 
 /// Global variables
+
+///Matrix of the two images
 Mat image1, image2;
+
+
 int rows;
 int cols;
 
@@ -785,8 +786,8 @@ void interface(int, void *)
     image1.copyTo(dst);
 
     ///on adapte l'importance des pixels de chaque image selon la valeur du trackbar
-    for (int i = 0; i < rows; i++) {
-	for (int j = 0; j < cols; j++) {
+    for (int i = 0; i < image1.rows; i++) {
+	for (int j = 0; j < image1.cols; j++) {
 
 	    dst.at < cv::Vec3b > (i, j)[0] = (float) (image2.at < cv::Vec3b > (i, j)[0]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[0]) * (float) ((100. - thresh) / 100.);
 	    dst.at < cv::Vec3b > (i, j)[1] = (float) (image2.at < cv::Vec3b > (i, j)[1]) * (float) (thresh / 100.) + (float) (image1.at < cv::Vec3b > (i, j)[1]) * (float) ((100. - thresh) / 100.);

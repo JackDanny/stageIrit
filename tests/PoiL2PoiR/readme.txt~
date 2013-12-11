@@ -172,12 +172,48 @@ SimpleBlobDetector(const SimpleBlobDetector::Params &parameters = SimpleBlobDete
 
 //SIFT
 
+/*
+ * SiftDescriptorExtractor (
+     double magnification, 
+     bool isNormalize = true, 
+     bool recalculateAngles = true,
+     int nOctaves=SIFT::CommonParams::DEFAULT_NOCTAVES, 
+     int nOctaveLayers=SIFT::CommonParams::DEFAULT_NOCTAVE_LAYERS, 
+     int firstOctave=SIFT::CommonParams::DEFAULT_FIRST_OCTAVE, 
+     int angleMode=SIFT::CommonParams::FIRST_ANGLE
+)
+ *
+ *mais on a:
+ *SIFT(int nfeatures=0,
+       int nOctaveLayers=3,
+       double contrastThreshold=0.04,
+       double edgeThreshold=10, 
+       double sigma=1.6) 
+ */
+
 //SURF
 
+/*
+ * SurfDescriptorExtractor (int nOctaves=4, int nOctaveLayers=2, bool extended=false)
+ * 
+ * mais on a:
+ *
+ *SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=false, bool upright=false)
+ */
+
+
 //BRIEF
-
+/*
+ *
+ *cv::BriefDescriptorExtractor::BriefDescriptorExtractor ( int bytes = 32 ) 
+ *
+ * // bytes is a length of descriptor in bytes. It can be equal 16, 32 or 64 bytes. 
+ */
 //ORB
-
+/*
+ *OrbDescriptorExtractor( ORB::PatchSize patch_size );
+ *
+ */
 
 
  /**************************************/

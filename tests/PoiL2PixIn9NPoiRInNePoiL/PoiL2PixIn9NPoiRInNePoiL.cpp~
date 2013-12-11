@@ -37,11 +37,11 @@ int threshMatches=50;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///keypoints2 correspond to keypoints detected in the 2nd image
-///pointsx correspond to the keypoints detected in the 1st image keep to be matched
-///pointsy correspond to the keypoints detected in the 2nd image keep to be matched
+///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
+///pointsy correspond to the keypoints detected in the 2nd image keeped to be matched
 vector < KeyPoint > keypoints1, keypoints2, pointsx, pointsy;
 
-//distance of the neighborhood, it's an EuclidianDistance
+//distance of the neighborhood were search matches, it's an EuclidianDistance
 int EucDist=30;
 
 ///vector of the matches of one keypoint.
@@ -60,6 +60,9 @@ void interface(int argc, void *);
 /**
  * @function main
  */
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -104,7 +107,7 @@ int main(int argc, char **argv)
         cout <<endl;
         
 
-        exit(0);
+        exit(-1);
     }
 
 
@@ -260,26 +263,33 @@ int main(int argc, char **argv)
     {
        
         descriptor = cv::DescriptorExtractor::create("BRIEF");
+        //or
+        //descriptor = cv::DescriptorExtractor::create("BRIEF");
 
     }
-    else if(strcmp(argv[4],"ORB")==0)
+     else if (strcmp(argv[4], "ORB") == 0) 
     {
-       descriptor = cv::DescriptorExtractor::create("ORB");
+	descriptor = new OrbDescriptorExtractor();
+        //or
+        //descriptor = cv::DescriptorExtractor::create("ORB");
 
     }
-     else if(strcmp(argv[4],"SIFT")==0)
+    else if (strcmp(argv[4], "SIFT") == 0) 
     {
-      
-      descriptor = cv::DescriptorExtractor::create("SIFT");
+	descriptor = new SiftDescriptorExtractor();
+        //or
+	//descriptor = cv::DescriptorExtractor::create("SIFT");
 
     }
-    else if(strcmp(argv[4],"SURF")==0){
+    else if (strcmp(argv[4], "SURF") == 0) 
+    {
+	descriptor = new SurfDescriptorExtractor();
+        //or
+	//descriptor = cv::DescriptorExtractor::create("SURF");
 
-       descriptor = cv::DescriptorExtractor::create("SURF");
-      
     }
 
-    ///checking of descriptor
+    ///checking descriptor
     else
     {
 
@@ -297,19 +307,12 @@ int main(int argc, char **argv)
      ///selection of matcher in function of argv[5]
      ///Be careful with the type of data of members of the descriptors matrix and the type of
      ///data valid by the matcher. Commons confusion are due to CV_8UC1 and CV_32FC1 
-    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
-
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-     
+     if (strcmp(argv[5], "BruteForce") == 0 || strcmp(argv[5], "BruteForce-L1") == 0 || strcmp(argv[5], "BruteForce-Hamming") == 0 || strcmp(argv[5], "FlannBased") == 0) 
+    {
+	matcher = cv::DescriptorMatcher::create(argv[5]);
     }
 
-   else if(strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
-
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-      
-    }
-
-    ///checking for the matcher
+    ///checking matcher
     else{
         cout << "\n matcher unknow"<<endl;
         cout << "\n matcher valid list:";
@@ -340,7 +343,7 @@ int main(int argc, char **argv)
     imshow("image2", image2);
 
     ///descriptors computation	
-    ///the descriptors has one index corresponding to the number of the keypoint (his place in the vector)
+    ///the descriptors have one index corresponding to the number of the keypoint (his place in the vector)
     ///and the other index for the value of one component of the vector used by the descriptor
     ///algorithm
     Mat descriptors1, descriptors2;
@@ -352,18 +355,18 @@ int main(int argc, char **argv)
     ///descriptor auxiliary to one keypoint of image1. It's a strategy for use the matcher	
     Mat descriptorAuxKp1;
 
-    ///descriptor to the keypoints of image2 in the neighborhood of the keypoint decribed in descriptorAuxKp1
+    ///descriptor to the keypoints of image2 in the neighborhood of the keypoint decribed by descriptorAuxKp1
     Mat descriptorNe;
 
-    ///vector of keypoints of image2 in the neighborhood of the keypoint decribed in descriptorAuxKp1
+    ///vector of keypoints of image2 in the neighborhood of the keypoint decribed by descriptorAuxKp1
     vector < KeyPoint > keypointsNe;
 
 
-    //if we have found at less one keypoint2 to match with our dear keypoint1 during traitement, aCorres=true
+    //if we find at less one keypoint2 to match with our dear keypoint1 during traitement, aCorres=true
     bool aCorres = false;
 
     //number of points matched. It's need to know how is matched with how
-    int pointCourant = 0;
+    int currentPoint = 0;
 
     for (int i = 0; i < keypoints1.size(); i++)
     {
@@ -377,13 +380,15 @@ int main(int argc, char **argv)
 //we delete all the keypointsNe associate with the previous keypoint1 
         keypointsNe.erase(keypointsNe.begin(), keypointsNe.end());
 
+        //we copy the coordonates for make easier calculation
+        float p1x = keypoints1[i].pt.x;
+        float p1y = keypoints1[i].pt.y;
+
+
 	//let's get started for find matching point
         for (int j = 0; j < keypoints2.size(); j++)
         {
 	    //we copy the coordonates for make easier calculation
-            float p1x = keypoints1[i].pt.x;
-            float p1y = keypoints1[i].pt.y;
-
             float p2x = keypoints2[j].pt.x;
             float p2y = keypoints2[j].pt.y;
 
@@ -396,7 +401,7 @@ int main(int argc, char **argv)
             if (distance <= EucDist)
             {
 
-                //here there is as less one point to match
+                //here there is at less one point to match
                 aCorres = true;
 		
 		//one keypoint of 8-neighborhood (or himself)
@@ -455,18 +460,18 @@ int main(int argc, char **argv)
 
             //we have found the best keypoint
             //normally here we have found one
-            KeyPoint best2 = keypointsNe[matches[0].trainIdx];
+            KeyPoint best = keypointsNe[matches[0].trainIdx];
 
 	    ///we add the keypoint in the list
-            pointsy.push_back(best2);
+            pointsy.push_back(best);
 
-	    ///good! in addition to this, we know that for each z<pointsx.size and >0,
+	    ///good! in addition to this, we know that for each z < pointsx.size and > 0,
 	    ///pointsx[z] is matched with poitsy[z]. So
-            matches[0].trainIdx = pointCourant;
-            matches[0].queryIdx = pointCourant;
+            matches[0].trainIdx = currentPoint;
+            matches[0].queryIdx = currentPoint;
 
 	    //ready for the next point!
-            pointCourant++;
+            currentPoint++;
 
 	    //of course we add the new match found in matchesWithDist
             matchesWithDist.insert(matchesWithDist.end(), matches.begin(), matches.end());
@@ -481,8 +486,6 @@ int main(int argc, char **argv)
 
 
 
-
-
     ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
 
@@ -491,14 +494,9 @@ int main(int argc, char **argv)
     /// position of the sorted element (it has only an effect about the running time)
     /// end position
 
-
-
-
-
-
-
+    //we keep only enough good matches with help from threshMatches
     for(int i=0;i<matchesWithDist.size();i++){
-	///when the quality of the matching become unsatisfactory, we eliminate all others matches
+	///when the quality of the match become unsatisfactory, we eliminate all others matches
  	if(matchesWithDist[i].distance>threshMatches){
 
 		matchesWithDist.erase(matchesWithDist.begin() + i,matchesWithDist.end());
@@ -544,7 +542,7 @@ int main(int argc, char **argv)
     ///interface is a recursive function allowing to use the trackbar
     interface(0, 0);
 
-    ///We wait the users press a key
+    ///We wait the user press a key
     waitKey(0);
     return (0);
 }
@@ -606,7 +604,7 @@ void interface(int, void *)
         ///we use RGB with one Byte for each color. So the number of color is...
         int nbColor = 256 * 256 * 256;
 
-        ///we have matchesWithDist.size() point to display. So:
+        ///we have matchesWithDist.size() points to display. So:
         int ColStep = nbColor / matchesWithDist.size();
 	///We can also divided by matches.size()-1 because point 0 to matches.size()-1, 
         ///but if matches.size()==1, it is not cool

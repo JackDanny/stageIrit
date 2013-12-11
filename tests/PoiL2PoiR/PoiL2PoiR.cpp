@@ -104,7 +104,7 @@ int main(int argc, char **argv)
         cout <<endl;
         
 
-        exit(0);
+        exit(-1);
     }
 
 
@@ -256,30 +256,37 @@ int main(int argc, char **argv)
 
     //descriptor/extractor selection in function of argv[4]
 
-    if(strcmp(argv[4],"BRIEF")==0)
+     if(strcmp(argv[4],"BRIEF")==0)
     {
        
         descriptor = cv::DescriptorExtractor::create("BRIEF");
+        //or
+        //descriptor = cv::DescriptorExtractor::create("BRIEF");
 
     }
-    else if(strcmp(argv[4],"ORB")==0)
+     else if (strcmp(argv[4], "ORB") == 0) 
     {
-       descriptor = cv::DescriptorExtractor::create("ORB");
+	descriptor = new OrbDescriptorExtractor();
+        //or
+        //descriptor = cv::DescriptorExtractor::create("ORB");
 
     }
-     else if(strcmp(argv[4],"SIFT")==0)
+    else if (strcmp(argv[4], "SIFT") == 0) 
     {
-      
-      descriptor = cv::DescriptorExtractor::create("SIFT");
+	descriptor = new SiftDescriptorExtractor();
+        //or
+	//descriptor = cv::DescriptorExtractor::create("SIFT");
 
     }
-    else if(strcmp(argv[4],"SURF")==0){
+    else if (strcmp(argv[4], "SURF") == 0) 
+    {
+	descriptor = new SurfDescriptorExtractor();
+        //or
+	//descriptor = cv::DescriptorExtractor::create("SURF");
 
-       descriptor = cv::DescriptorExtractor::create("SURF");
-      
     }
 
-    ///checking of descriptor
+    ///checking descriptor
     else
     {
 
@@ -297,19 +304,12 @@ int main(int argc, char **argv)
      ///selection of matcher in function of argv[5]
      ///Be careful with the type of data of members of the descriptors matrix and the type of
      ///data valid by the matcher. Commons confusion are due to CV_8UC1 and CV_32FC1 
-    if(strcmp(argv[5],"BruteForce")==0 || strcmp(argv[5],"BruteForce-L1")==0){
-
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-     
+    if (strcmp(argv[5], "BruteForce") == 0 || strcmp(argv[5], "BruteForce-L1") == 0 || strcmp(argv[5], "BruteForce-Hamming") == 0 || strcmp(argv[5], "FlannBased") == 0) 
+    {
+	matcher = cv::DescriptorMatcher::create(argv[5]);
     }
 
-   else if(strcmp(argv[5],"BruteForce-Hamming")==0 || strcmp(argv[5],"FlannBased")==0){
-
-       matcher = cv::DescriptorMatcher::create(argv[5]);
-      
-    }
-
-    ///checking for the matcher
+    ///checking matcher
     else{
         cout << "\n matcher unknow"<<endl;
         cout << "\n matcher valid list:";
@@ -340,7 +340,7 @@ int main(int argc, char **argv)
     imshow("image2", image2);
 
     ///descriptors computation	
-    ///the descriptors has one index corresponding to the number of the keypoint (his place in the vector)
+    ///the descriptors have one index corresponding to the number of the keypoint (his place in the vector)
     ///and the other index for the value of one component of the vector used by the descriptor
     ///algorithm
     Mat descriptors1, descriptors2;
