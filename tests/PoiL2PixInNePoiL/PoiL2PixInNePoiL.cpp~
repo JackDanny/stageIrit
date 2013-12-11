@@ -71,6 +71,7 @@ int main(int argc, char **argv)
    Ptr<DescriptorExtractor> descriptor;  
    Ptr<DescriptorMatcher> matcher;
     
+
    ///checking the number of argument
    if(argc!=6)
    {
@@ -326,7 +327,7 @@ int main(int argc, char **argv)
     }
 
 
-     ///part of title of the windows composed by detector+descriptor+matcher,
+    ///part of title of the windows composed by detector+descriptor+matcher,
     ///for know what is what
     string st1 = argv[3] + (string) " + " + argv[4] + (string) " + " + argv[5];
     string st2 = "transparence " + st1;
@@ -365,7 +366,7 @@ int main(int argc, char **argv)
     //if we find at less one keypoint2 to match with our dear keypoint1 during traitement, aCorres=true
     bool aCorres = false;
 
-     //number of points matched. It's need to know how is matched with how
+     //number of points matched. It's need to know who is matched with who
     int currentPoint = 0;
 
     for (int i = 0; i < keypoints1.size(); i++) 
@@ -377,7 +378,7 @@ int main(int argc, char **argv)
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
 
-//we delete all the keypointsNe associate with the previous keypoint1 
+//we delete all the keypointsNe associated with the previous keypoint1 
 	pixelsNe.erase(pixelsNe.begin(), pixelsNe.end());
 
         //we copy the coordonates for make easier calculation
@@ -388,6 +389,7 @@ int main(int argc, char **argv)
         //let's get started for find matching point
 	for (int x2 = - EucDist; x2 <  EucDist + 1; x2++) {
 	    for (int y2 = - EucDist; y2 <  EucDist + 1; y2++) {
+ 
                 //we calculate the coordonates of pixels in a square neighborhood
 		float p2x = p1x + x2;
 		float p2y = p1y + y2;
@@ -404,11 +406,11 @@ int main(int argc, char **argv)
 			//here there is at less one point to match
 			aCorres = true;
 
-                        //we create a keypoint with the coordonate of the pixel
+                        //we create a keypoint with the coordonates of the pixel
 			KeyPoint kpNe;
 			kpNe.pt.x = p2x;
 			kpNe.pt.y = p2y;
-			//we must informed the kaypoint size
+			//we must informed the keypoint size
 			kpNe.size = keypoints1[0].size;
 
                         //we add the pixel in the pixel list to consider
@@ -431,7 +433,7 @@ int main(int argc, char **argv)
 	   //we compute the descriptor of all pixels selected as candidate
 	    (*descriptor).compute(image2, pixelsNe, descriptorNe);
 
-            ///here we match only one keypoint1 with the best of keypoints2
+            ///here we match only one keypoint1 with the best of pixelsNe
 	    matcher->match(descriptorAuxKp1, descriptorNe, matches);
 
 	    //we have found the best keypoint
@@ -489,15 +491,6 @@ int main(int argc, char **argv)
      }*/
 
 
-     for(int i=0;i<matchesWithDist.size();i++){
-	///when the quality of the matching become unsatisfactory, we eliminate all others matches
- 	if(matchesWithDist[i].distance>threshMatches){
-
-		matchesWithDist.erase(matchesWithDist.begin() + i,matchesWithDist.end());
-
-        }
-    }
-
     ///the matrix composed by the two images, the pointsx and pointsy
     ///the matches are colored, there is no keypoints displayed no matched
     ///the image is often hard to interpret due to the great number of element to display
@@ -514,7 +507,7 @@ int main(int argc, char **argv)
      ///we display the result and we create a image png named "result" in the local repository 
     namedWindow(matches_window, CV_WINDOW_AUTOSIZE);
     imshow(matches_window, imageMatches);
-    imwrite("resultat.png", imageMatches);
+    imwrite("result.png", imageMatches);
 
 
 
@@ -561,7 +554,7 @@ void interface(int, void *)
     float kp2x;
     float kp2y;
 
-    //coordonates of KeyPoint (image dst)
+    ///coordonates of KeyPoint (image dst)
     float kptx;
     float kpty;
 

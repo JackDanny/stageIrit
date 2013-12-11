@@ -241,8 +241,3 @@ comment utiliser 2string:
     string ty = type2str(matrix.type());
     printf("Matrix: %s %dx%d n", ty.c_str(), matrix.cols, matrix.rows);
 
-comment convertir le type d'une matrice:
-// descriptorAuxKp1.convertTo(descriptorAuxKp1, CV_8UC1);
-
-attention à la conversion CV_8UC1 <-> CV_32FUC1
-
