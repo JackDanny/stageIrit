@@ -1,48 +1,50 @@
 #include <opencv2/opencv.hpp>
-
-#include <iostream>
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/nonfree/features2d.hpp"
-#include <opencv2/legacy/legacy.hpp>
-#include "opencv2/core/mat.hpp"
-
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/mat.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 
 using namespace cv;
 using namespace std;
 
 /// Global variables
+
+///Matrix of the two images
 Mat image1, image2;
 
-
-
+///name of the window with a trackbar
 string transparency_window;
+
+///name of the window with the two images, their KeyPoints and their matches
 string matches_window;
 
-
-
+///initial value of the thresh at the begining at the launching of the interface
 int thresh = 0;
+
+///value max of the trackbar
 int max_thresh = 100;
 
+///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
+///the evaluation of similarity between two points.
+float threshMatches=80;
 
-//seuil pour la comparaison des descripteurs
-float seuil=80;
+///keypoints1 correspond to keypoints detected in the 1st image
+///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
+///pointsy correspond to the keypoints detected in the 2nd image keeped to be matched
+vector < KeyPoint > keypoints1, keypoints2, pointsx, pointsy;
+
+
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
 //int rayonDist = 100;
 
-//dans keypoints1 on a les kp de l'image de gauche auxquels 
-//on a apparié le meilleur pixel du voisinage correspondant
-
-//on a appariés les pointsx de l'image gauche avec les pointsy de l'image de droite
-
-vector < KeyPoint > keypoints1, keypoints2, pointsx, pointsy;
 
 //puis on a vérifies qu'en appariant les pointsy avec l'image gauche, on retombait sur 
 //nos pas, ce qui a formé pointsy2 et pointsx2
@@ -718,7 +720,7 @@ pointCourant = 0;
 	    	matches[0].queryIdx = pointCourant;
 
 		//cout << endl <<matches[0].distance;
-                if(abs(matches[0].distance)< seuil){
+                if(abs(matches[0].distance)< threshMatches){
                 //cout << matches[0].distance;
                  
                 pointsx2.push_back(kpfind);

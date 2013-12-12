@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <opencv2/legacy/legacy.hpp>
+
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
@@ -12,7 +12,7 @@
 
 
 using namespace cv;
-using namespace std;
+using namespace std; 
 
 /// Global variables
 
@@ -33,12 +33,12 @@ int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-int threshMatches=50;
+float threshMatches=100;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
 ///pointsy correspond to the keypoints detected in the 2nd image keeped to be matched
-vector < KeyPoint > keypoints1, pointsx, pointsy;
+vector < KeyPoint > keypoints1, keypoints2, pointsx, pointsy;
 
 
 //And we have checked that in matching pointsy  with the 1st image, we  retrieve the same point 
@@ -48,10 +48,6 @@ vector < KeyPoint > keypoints1, pointsx, pointsy;
 vector < KeyPoint > pointsy2,pointsx2; 
 
 
-//distance of the neighborhood were we search pixels to matched, it's an EuclidianDistance
-//we use this value for the neighborhood were we search to match pointsx with pointy, but
-//so pointsy2 to pointsx2
-int EucDist = 50;
 
 ///vector of the matches of one keypoint.
 vector < DMatch > matches;
@@ -154,6 +150,7 @@ int main(int argc, char **argv)
     {
 	MserFeatureDetector detector;
 	detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
     }
 
 
@@ -161,12 +158,14 @@ int main(int argc, char **argv)
     {
 	FastFeatureDetector detector(50, true);
 	detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
     }
 
     else if (strcmp(argv[3], "STAR") == 0) 
     {
 	StarFeatureDetector detector;
 	detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
     }
 
 
@@ -175,6 +174,7 @@ int main(int argc, char **argv)
 
 	SiftFeatureDetector detector;
 	detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
 
 	///or
 	/*
@@ -188,6 +188,7 @@ int main(int argc, char **argv)
 
 	SurfFeatureDetector detector;
 	detector.detect(image1, keypoints1);
+        detector.detect(image2, keypoints2);
 
         ///or
 	/*
@@ -198,14 +199,15 @@ int main(int argc, char **argv)
     }
     else if (strcmp(argv[3], "ORB") == 0) 
     {
-	ORB detector(200);
+	/*ORB detector;
 	detector(image1, Mat(), keypoints1);
-
+        detector(image2, Mat(), keypoints2);
+	*/
         ///or
-	/*
+	
 	   OrbFeatureDetector detector;
 	   detector.detect(image1, keypoints1);
-	 */
+	   detector.detect(image2, keypoints2);
     }
 
 
@@ -213,14 +215,14 @@ int main(int argc, char **argv)
     {
 	GoodFeaturesToTrackDetector detector(1000, 0.01, 1., 3, true, 0.04);
 	detector.detect(image1, keypoints1);
-
+        detector.detect(image2, keypoints2);
 
     }
     else if (strcmp(argv[3], "GFTT") == 0) 
     {
 	GoodFeaturesToTrackDetector detector;
 	detector.detect(image1, keypoints1);
-
+        detector.detect(image2, keypoints2);
     }
 
     else if (strcmp(argv[3], "DENSE") == 0) 
@@ -231,8 +233,10 @@ int main(int argc, char **argv)
         ///other usage:
 	//DenseFeatureDetector detector(0.5);
 	detector->detect(image1, keypoints1);
+        detector->detect(image2, keypoints2);
 
-    } else if (strcmp(argv[3], "SIMPLE BLOB") == 0) {
+    } 
+    else if (strcmp(argv[3], "SIMPLE BLOB") == 0) {
 	cv::SimpleBlobDetector::Params params;
 	params.minDistBetweenBlobs = 10.0;     // minimum 10 pixels between blobs
 	params.filterByArea = true;	       // filter my blobs by area of blob
@@ -241,7 +245,7 @@ int main(int argc, char **argv)
 	SimpleBlobDetector detector(params);
 
 	detector.detect(image1, keypoints1);
-
+        detector.detect(image2, keypoints2);
     }
 
     ///checking detector
@@ -342,11 +346,11 @@ int main(int argc, char **argv)
     string st1 = argv[3] + (string) " + " + argv[4] + (string) " + " + argv[5];
     string st2 = "transparence " + st1;
 
+     
     transparency_window = st2;
     matches_window = st1;
 
-
-
+    
     //Displaying of the two images
     namedWindow("image1", WINDOW_AUTOSIZE);
     imshow("image1", image1);
@@ -357,110 +361,59 @@ int main(int argc, char **argv)
     ///the descriptors have one index corresponding to the number of the keypoint (his place in the vector)
     ///and the other index for the value of one component of the vector used by the descriptor
     ///algorithm
-    Mat descriptors1;
-    cout << endl <<"nb de kp before descriptor:"<< keypoints1.size()<<endl;
+    Mat descriptors1; //for 1st image
+    Mat descriptors2; //for 2nd image
+
+
+    cout << endl <<"nb de kp1 before descriptor:"<< keypoints1.size()<<endl;
 
     (*descriptor).compute(image1, keypoints1, descriptors1);
 
-    cout << endl <<"nb de kp after descriptor:"<< keypoints1.size()<<endl;
+    cout << endl <<"nb de kp1 after descriptor:"<< keypoints1.size()<<endl;
+    
+    cout << endl <<"nb de kp2 before descriptor:"<< keypoints2.size()<<endl;
+
+    (*descriptor).compute(image2, keypoints2, descriptors2);
+
+    cout << endl <<"nb de kp2 after descriptor:"<< keypoints2.size()<<endl;
+
+    string ty = type2str(descriptors1.type());
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
+    
+
 
     ///descriptor auxiliary to one keypoint of image1. It's a strategy for use the matcher
     Mat descriptorAuxKp1;
-
-     ///descriptor to the pixels of image2 in the neighborhood of the keypoint decribed by descriptorAuxKp1
-    Mat descriptorNe;
-     
-
-     ///vector of pixels of image2 in the neighborhood of the keypoint decribed by descriptorAuxKp1   
-    vector < KeyPoint > pixelsNe;
-
-
-     //if we find at less one keypoint2 to match with our dear keypoint1 during traitement, aCorres=true
-    bool aCorres = false;
+   
 
     //number of points matched. It's need to know who is matched with who
     int currentPoint = 0;
 
-
     for (int i = 0; i < keypoints1.size(); i++) {
-	//we have not found currently a keypoint to match with kp1[i]
-	aCorres = false;
-
+	
 	//We copy the line i of the descriptor,corresponding to values give by the descriptor for the Keypoints[i]
 	descriptors1.row(i).copyTo(descriptorAuxKp1);
 
-        
-//we delete all the keypointsNe associate with the previous keypoint1 
-	pixelsNe.erase(pixelsNe.begin(), pixelsNe.end());
-
-        //we copy the coordonates for make easier calculation
-	float p1x = keypoints1[i].pt.x;
-	float p1y = keypoints1[i].pt.y;
-
-        //let's get started for find matching point
-	for (int x2 = -EucDist; x2 < EucDist + 1; x2++) {
-	    for (int y2 = -EucDist; y2 < EucDist + 1; y2++) {
-
-                 //we calculate the coordonates of pixels in a square neighborhood
-		float p2x = p1x + x2;
-		float p2y = p1y + y2;
-
-		
-		//the coordonates of the point must staying in the image
-		if (p2x >= 0 && p2x < image1.rows && p2y >= 0 && p2y < image1.cols) {
-
-		    //the euclidian distance between the two points is evaluated wit the famous formula
-                    float distance = sqrt(pow(x2, 2) + pow(y2, 2));
-             
-                    //And I prefer a circular neighborhood
-		    if (distance <= EucDist) {
-			//here there is at less one point to match
-			aCorres = true;
-
-			 //we create a keypoint with the coordonates of the pixel
-			KeyPoint kpNe;
-			kpNe.pt.x = p2x;
-			kpNe.pt.y = p2y;
-                        //we must informed the keypoint size
-			kpNe.size = keypoints1[0].size;
-
-                        //we add the pixel in the pixel list to consider
-			pixelsNe.push_back(kpNe);
-		    }
-
-		}
-
-
-	    }
-	}
+        ///here we match only one keypoint1 with the best of descriptors2
 
 
 
-	//we check if kp1 has one pixel matched
-	if (aCorres) {
-	   //we know keypoints1[i] get be matched. So we add him in the list.
-	    pointsx.push_back(keypoints1[i]);
-
-	    //we compute the descriptor of all pixels selected as candidate
-	    (*descriptor).compute(image2, pixelsNe, descriptorNe);
-
-
-             ///here we match only one keypoint1 with the best of pixelsNe
-	    matcher->match(descriptorAuxKp1, descriptorNe, matches);
-
-	    //we have found the best keypoint
-            //normally here we have found one
-	    KeyPoint best = pixelsNe[matches[0].trainIdx];
-
-            ///we add the pixel in the list
-	    pointsy.push_back(best);
-
-	    
-
-             //ready for the next point!
-	    currentPoint++;
+        matcher->match(descriptorAuxKp1, descriptors2, matches);
+ 
+	///we need to have a no empty vector
+	if(matches.size()>0){
+       		///we add the KeyPoint in the list
+        	pointsx.push_back(keypoints1[i]);
             
+		KeyPoint kp2 = keypoints2[matches[0].trainIdx];
+        	///we add the KeyPoint in the list
+                pointsy.push_back(kp2);
+                
+                //ready for the next point!
+		currentPoint++;
 	}
+
+
 
 
     }				//end of "for i"
@@ -473,127 +426,67 @@ int main(int argc, char **argv)
 
 
 
-
-//mark to separate the two treatments
+//mark for separate the two treatments
 /**********************************************************************************************/
 
 //why not reuse our old variables?
 currentPoint = 0;
 
-///descriptor auxiliary to one points of pointsy. It's a strategy for use the matcher
-    Mat descriptorAuxPtsy;
+///descriptor for the pointsy
+ Mat descriptorsPtsy;
 
-///descriptor to the pixels of image1 in the neighborhood of the keypoint decribed by
-//descriptorAuxPtsy
- Mat descriptorsPixs;
+///descriptor for the pointsx
+ Mat descriptorsPtsx;
+
+ ///descriptor auxiliary to one keypoint of image2. It's a strategy for use the matcher
+ Mat descriptorAuxKp2;
 
 //Warning! we calculate the image2 descriptor here
- (*descriptor).compute(image2, pointsy, descriptorsPixs);
+ (*descriptor).compute(image2, pointsy, descriptorsPtsy);
+
+
+//Warning! we calculate the image1 descriptor here
+ (*descriptor).compute(image1, pointsx, descriptorsPtsx);
+
 
 
  for (int i = 0; i < pointsy.size(); i++) {
-	//we have not found currently a keypoint to match with pointsy[i]
-	aCorres = false;
 
-	//We copy the line i of the descriptor,corresponding to values give by the descriptor for the pointsy[i]
-	descriptorsPixs.row(i).copyTo(descriptorAuxPtsy);
+ 	//We copy the line i of the descriptor,corresponding to values give by the descriptor for the pointsy[i].
+	    descriptorsPtsy.row(i).copyTo(descriptorAuxKp2);
+            
 
-
-///we delete all the keypointsNe associated with the previous pointsy 
-	pixelsNe.erase(pixelsNe.begin(), pixelsNe.end());
-
-	//we copy the coordonates for make easier calculation
-	float p1x = pointsy[i].pt.x;
-	float p1y = pointsy[i].pt.y;
-
-        //let's get started for find matching point
-	for (int x2 = -EucDist; x2 < EucDist + 1; x2++) {
-	    for (int y2 = -EucDist; y2 < EucDist + 1; y2++) {
-
-		//we calculate the coordonates of pixels first in a square neighborhood for reduct
-		//the search area
-		float p2x = p1x + x2;
-		float p2y = p1y + y2;
-
-		
-                //the coordonates of the point must staying in the image
-		if (p2x >= 0 && p2x < image2.rows && p2y >= 0 && p2y < image2.cols) {
-
- 			//the euclidian distance between the two points is evaluated wit the famous formula
-			float distance = sqrt(pow(x2, 2) + pow(y2, 2));
-		     
-			//And I prefer a circular neighborhood
-		    if (distance <= EucDist) {
-			//here there is at less one point to match
-			aCorres = true;
-
-			 //we create a keypoint with the coordonates of the pixel
-			KeyPoint kpNe;
-			kpNe.pt.x = p2x;
-			kpNe.pt.y = p2y;
-			//we must informed the keypoint size
-			kpNe.size = keypoints1[0].size;
-
-                        //we add the pixel in the pixel list to consider
-			pixelsNe.push_back(kpNe);
-		    }
-
-		}
+	    matcher->match(descriptorAuxKp2, descriptorsPtsx, matches);
 
 
-	    }
-	}
+	    //we need to have a no empty vector
+	    if(matches.size()>0){
 
+               //we found the best keypoint
+	       KeyPoint kpfind = pointsx[matches[0].trainIdx];
 
+	       //we compare the keypoint found
+               if( (kpfind.pt.x == pointsx[i].pt.x)  && (kpfind.pt.y == pointsx[i].pt.y) ){
 
-        //we check if the pixel(2nd image) has one pixel (1st image) matched
-	if (aCorres){
+                   //good! in addition to this, we know that for each z < pointsx.size and > 0,
+                   ///pointsx2[z] is matched with poitsy2[z]. So
+                   matches[0].trainIdx = currentPoint;
+	           matches[0].queryIdx = currentPoint;
 
-	    //we compute the descriptor of all pixels selected as candidate
-	    (*descriptor).compute(image1, pixelsNe, descriptorNe);
-
-             ///here we match only one pixel of pointsy with the best of pixelsNe
-	    matcher->match(descriptorAuxPtsy, descriptorNe, matches);
-
-	    //we have found the best keypoint
-            //normally here we have found one
-	    KeyPoint best = pixelsNe[matches[0].trainIdx];
-
-	    //comparing. a difference of 1 pixel is allowed
-	    //We can do that because pointsx and pointsy are sorted, i.e pointsx[i] is matched with pointsy[i] 
-            if( (abs( (best.pt.x) - (pointsx[i].pt.x) ) <= 1.) && (abs ( (best.pt.y) - pointsx[i].pt.y) <= 1.)){
-
-              
-		//we had could sort matchesWithDist2 and delete matches with distance too high
-		//but like that pointsx2 and pointsy2 contains only enough good points
-                if(abs(matches[0].distance)< threshMatches){
-
-
-		        //good! in addition to this, we know that for each z < pointsx.size and > 0,
-                        ///pointsx[z] is matched with poitsy[z]. So
-                        matches[0].trainIdx = currentPoint;
-	    	        matches[0].queryIdx = currentPoint;
-
-                 
-			///we had our points in the lists
-               		pointsx2.push_back(best);
-                	pointsy2.push_back(pointsy[i]);
+		   //we keep only enough good matches 
+                   if(abs(matches[0].distance)<= threshMatches)
+                   {
+                   
+                      ///we aad our points in the lists
+                      pointsx2.push_back(kpfind);
+                      pointsy2.push_back(pointsy[i]);
                 
-                	matchesWithDist2.insert(matchesWithDist2.end(), matches.begin(), matches.end());
-                	currentPoint++;
-                }
+                      matchesWithDist2.insert(matchesWithDist2.end(), matches.begin(), matches.end());
+                      currentPoint++;
+                   }
+           }
 
-
-            }            
-
-           
-
-	}
-        else{
-		///Normaly it is impossible to fall here.
-               
-		cout << "\n Houston, we've had a problem \n";
-        }
+         }
 
 
     }				//end of "for i"
@@ -609,27 +502,30 @@ currentPoint = 0;
 
 
 
-    cout << endl<< "nb of matching: " << matchesWithDist2.size() << endl;
+   cout << endl<< "nb of matching: " << matchesWithDist2.size() << endl;
 
 
-///matches are sorted with the help of the definition of the operator "<". Here it 
+
+   
+    ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
     nth_element(matchesWithDist2.begin(), matchesWithDist2.begin(), matchesWithDist2.end());
     // initial position
     // position of the sorted element
     // end position
 
+    
     //if we want to keep only some matches
     /* if(matches.size()>500){
        matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
      }*/
 
-    
 
     ///the matrix composed by the two images, the pointsx and pointsy
     ///the matches are colored, there is no keypoints displayed no matched
     ///the image is often hard to interpret due to the great number of element to display
     Mat imageMatches;
+
     drawMatches(image1, pointsx2,	// 1st image and its keypoints
 		image2, pointsy2,	// 2nd image and its keypoints
 		matchesWithDist2,	// the matches
@@ -638,7 +534,7 @@ currentPoint = 0;
 		Scalar(255, 255, 255)	//color of the keypoints
 	);
 
-     ///we display the result and we create a image png named "result" in the local repository 
+    ///we display the result and we create a image png named "result" in the local repository 
     namedWindow(matches_window, CV_WINDOW_AUTOSIZE);
     imshow(matches_window, imageMatches);
     imwrite("result.png", imageMatches);
@@ -651,7 +547,7 @@ currentPoint = 0;
     ///each time we move the trackbar cursor, the value of thresh change and
     ///the fonction interface is call back
     createTrackbar("Threshold: ", transparency_window, &thresh, max_thresh, interface);
-
+    
     ///interface is a recursive function allowing to use the trackbar
     interface(0, 0);
 
@@ -662,6 +558,8 @@ currentPoint = 0;
 
 void interface(int, void *)
 {
+
+ 
     ///Matrix destination of the image we want to display
     Mat dst;
 
@@ -695,25 +593,26 @@ void interface(int, void *)
 
     for (int i = 0; i < matchesWithDist2.size(); i++) {
 
-          ///we calculate the coordonates of the two points to matched
+        ///we calculate the coordonates of the two points to matched
 	kp1x = pointsx2[matchesWithDist2[i].queryIdx].pt.x;
 	kp1y = pointsx2[matchesWithDist2[i].queryIdx].pt.y;
 
 	kp2x = pointsy2[matchesWithDist2[i].trainIdx].pt.x;
 	kp2y = pointsy2[matchesWithDist2[i].trainIdx].pt.y;
 
-        //and we calculate the position of the point to display in the dst image
+         //and we calculate the position of the point to display in the dst image
         //by linear interpolation with the help of thresh
 	kptx = kp1x * (100. - thresh) / 100. + kp2x * (thresh / 100.);
 	kpty = kp1y * (100. - thresh) / 100. + kp2y * (thresh / 100.);
 
 	Point ptkp1 = Point(kptx, kpty);
 
-	 ///we use RGB with one Byte for each color. So the number of color is...
+         ///we use RGB with one Byte for each color. So the number of color is...
 	int nbColor = 256 * 256 * 256;
-        
+
         ///we have matchesWithDist.size() points to display. So:
 	int ColStep = nbColor / matchesWithDist2.size();
+
 	///We can also divided by matches.size()-1 because point 0 to matches.size()-1, 
         ///but if matches.size()==1, it is not cool
 
@@ -736,7 +635,7 @@ void interface(int, void *)
 	//so we draw the point
         circle(dst, ptkp1, 5, Scalar(red, green, blue), 2, 8, 0);
     }
-     //and we display the beautiful colored window
+    //and we display the beautiful colored window
     namedWindow(transparency_window, WINDOW_AUTOSIZE);
     imshow(transparency_window, dst);
     //we decide to write the actual image dst for use illustration

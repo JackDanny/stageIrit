@@ -340,7 +340,7 @@ int main(int argc, char **argv)
     imshow("image2", image2);
 
     ///descriptors computation	
-    ///the descriptors has one index corresponding to the number of the keypoint (his place in the vector)
+    ///the descriptors have one index corresponding to the number of the keypoint (his place in the vector)
     ///and the other index for the value of one component of the vector used by the descriptor
     ///algorithm
     Mat descriptors1, descriptors2;
