@@ -57,6 +57,10 @@ vector < DMatch > matches;
 ///it's a callback fonction call each time we move the cursor of the trackbar
 void interface(int argc, void *);
 
+//function for know the datatype of members in one matrix, e.g CV_8UC1
+string type2str(int type);
+
+
 /**
  * @function main
  */
@@ -175,7 +179,8 @@ int main(int argc, char **argv)
 
     else if(strcmp(argv[3],"SURF")==0)
     {
-        SurfFeatureDetector detector(2000);
+        //SurfFeatureDetector detector(2000);
+        SurfFeatureDetector detector;
         detector.detect(image1, keypoints1);
         detector.detect(image2, keypoints2);
 
@@ -258,8 +263,9 @@ int main(int argc, char **argv)
 
      if(strcmp(argv[4],"BRIEF")==0)
     {
+
+        descriptor = new BriefDescriptorExtractor(64);
        
-        descriptor = cv::DescriptorExtractor::create("BRIEF");
         //or
         //descriptor = cv::DescriptorExtractor::create("BRIEF");
 
@@ -345,9 +351,22 @@ int main(int argc, char **argv)
     ///algorithm
     Mat descriptors1, descriptors2;
     
+    
+    
+    cout << endl <<"nb de kp1 before descriptor:"<< keypoints1.size()<<endl;
+
     (*descriptor).compute(image1, keypoints1, descriptors1);
+
+    cout << endl <<"nb de kp1 after descriptor:"<< keypoints1.size()<<endl;
+    
+    cout << endl <<"nb de kp2 before descriptor:"<< keypoints2.size()<<endl;
+
     (*descriptor).compute(image2, keypoints2, descriptors2);
 
+    cout << endl <<"nb de kp2 after descriptor:"<< keypoints2.size()<<endl;
+
+    string ty = type2str(descriptors1.type());
+    printf("Matrix: %s %dx%d \n", ty.c_str(), descriptors1.cols, descriptors1.rows);
     
     ///We matches the keypoints
     ///in matches are connected the keypoints with their index in the vector 
@@ -360,24 +379,24 @@ int main(int argc, char **argv)
     ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
 
-    nth_element(matches.begin(), matches.begin(), matches.end());
+    sort(matches.begin(), matches.end());
     /// initial position
-    /// position of the sorted element (it has only an effect about the running time)
     /// end position
+    
 
     for(int i=0;i<matches.size();i++){
 	///when the quality of the matching become unsatisfactory, we eliminate all others matches
- 	if(matches[i].distance>threshMatches){
+ 	if(matches[i].distance>50){
 
 		matches.erase(matches.begin() + i,matches.end());
 
         }
     }
-
+     cout << endl<< "nb of matching: " << matches.size() << endl;
 
     //if we want to keep only some matches
     /* if(matches.size()>500){
-       matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
+       matches.erase(matches.begin() + 500,matches.end());
      }*/
 
     ///the matrix composed by the two images, the keypoints1 and keypoints2
@@ -504,4 +523,47 @@ void interface(int, void *)
     namedWindow(transparency_window, WINDOW_AUTOSIZE);
     imshow(transparency_window, dst);
 }
+
+
+string type2str(int type)
+{
+    string r;
+
+    uchar depth = type & CV_MAT_DEPTH_MASK;
+    uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+    switch (depth) {
+    case CV_8U:
+	r = "8U";
+	break;
+    case CV_8S:
+	r = "8S";
+	break;
+    case CV_16U:
+	r = "16U";
+	break;
+    case CV_16S:
+	r = "16S";
+	break;
+    case CV_32S:
+	r = "32S";
+	break;
+    case CV_32F:
+	r = "32F";
+	break;
+    case CV_64F:
+	r = "64F";
+	break;
+    default:
+	r = "User";
+	break;
+    }
+
+    r += "C";
+    r += (chans + '0');
+
+    return r;
+}
+
+
 

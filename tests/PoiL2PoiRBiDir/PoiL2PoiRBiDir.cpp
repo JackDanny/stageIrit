@@ -29,11 +29,11 @@ string matches_window;
 int thresh = 0;
 
 ///value max of the trackbar
-int max_thresh = 75;
+int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-float threshMatches=100;
+float threshMatches=50;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
@@ -474,7 +474,7 @@ currentPoint = 0;
 	           matches[0].queryIdx = currentPoint;
 
 		   //we keep only enough good matches 
-                   if(abs(matches[0].distance)<= threshMatches)
+                   if(matches[0].distance<= threshMatches)
                    {
                    
                       ///we aad our points in the lists
@@ -509,9 +509,8 @@ currentPoint = 0;
    
     ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
-    nth_element(matchesWithDist2.begin(), matchesWithDist2.begin(), matchesWithDist2.end());
+    sort(matchesWithDist2.begin(),matchesWithDist2.end());
     // initial position
-    // position of the sorted element
     // end position
 
     
