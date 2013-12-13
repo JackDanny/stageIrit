@@ -386,7 +386,7 @@ int main(int argc, char **argv)
 
     for(int i=0;i<matches.size();i++){
 	///when the quality of the matching become unsatisfactory, we eliminate all others matches
- 	if(matches[i].distance>50){
+ 	if(matches[i].distance>threshMatches){
 
 		matches.erase(matches.begin() + i,matches.end());
 

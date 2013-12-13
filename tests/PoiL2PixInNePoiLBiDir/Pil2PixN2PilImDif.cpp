@@ -917,9 +917,9 @@ pointCourant = 0;
 
 
 //ici on trie les matchesWithDist2 par distance des valeurs des descripteurs et non par distance euclidienne
-    nth_element(matchesWithDist2.begin(), matchesWithDist2.begin() + 24, matchesWithDist2.end());
+   sort(matchesWithDist2.begin(), matchesWithDist2.end());
     // initial position
-    // position of the sorted element
+    
     // end position
 
     //si on veut garder les meilleurs correspondances

@@ -469,9 +469,8 @@ int main(int argc, char **argv)
 
     ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
-    nth_element(matchesWithDist.begin(), matchesWithDist.begin(), matchesWithDist.end());
+   sort(matchesWithDist.begin(), matchesWithDist.end());
     // initial position
-    // position of the sorted element
     // end position
 
     //we keep only enough good matches with help from threshMatches

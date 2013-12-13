@@ -589,12 +589,12 @@ int main(int argc, char **argv)
     Mat descriptors1;
     cout << endl <<"nb de kp:"<< keypoints1.size()<<endl;
 
-
+/*
     for(int idxkp1 = 0;idxkp1<keypoints1.size();idxkp1++){
           cout << "keypoints1 "<< idxkp1 << " x=" << keypoints1[idxkp1].pt.x;
           cout << " y=" << keypoints1[idxkp1].pt.y<<endl;
     }
-
+*/
 
      //cout << "keypoints1: " << keypoints1<<endl; 
 
@@ -603,10 +603,13 @@ int main(int argc, char **argv)
 
     cout << endl <<"nb de kp:"<< keypoints1.size()<<endl;
 
+/*
      for(int idxkp1 = 0;idxkp1<keypoints1.size();idxkp1++){
           cout << "keypoints1 "<< idxkp1 << " x=" << keypoints1[idxkp1].pt.x;
           cout << " y=" << keypoints1[idxkp1].pt.y<<endl;
     }
+*/
+
     //cout << "keypoints1: " << keypoints1<<endl; 
 
     //matrice auxiliaire des descripteurs d'un Kp

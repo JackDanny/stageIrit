@@ -614,9 +614,9 @@ currentPoint = 0;
 
 ///matches are sorted with the help of the definition of the operator "<". Here it 
     ///means with the distanceMatching value. Indeed, a DMatch has a field distance
-    nth_element(matchesWithDist2.begin(), matchesWithDist2.begin(), matchesWithDist2.end());
+   sort(matchesWithDist2.begin(), matchesWithDist2.end());
     // initial position
-    // position of the sorted element
+    
     // end position
 
     //if we want to keep only some matches

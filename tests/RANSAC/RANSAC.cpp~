@@ -35,7 +35,7 @@ int max_thresh = 100;
 
 
 //seuil pour la comparaison des descripteurs
-float seuil=5;
+float seuil=0.5;
 
 //rayon autour duquel on cherche les pixels autours d'un kp1
 //int rayonDist = 100;
