@@ -33,7 +33,7 @@ int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-int threshMatches=50;
+int threshMatches=100;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
@@ -51,7 +51,7 @@ vector < KeyPoint > pointsy2,pointsx2;
 //distance of the neighborhood were we search pixels to matched, it's an EuclidianDistance
 //we use this value for the neighborhood were we search to match pointsx with pointy, but
 //so pointsy2 to pointsx2
-int EucDist = 50;
+int EucDist = 10;
 
 ///vector of the matches of one keypoint.
 vector < DMatch > matches;
@@ -621,7 +621,7 @@ currentPoint = 0;
 
     //if we want to keep only some matches
     /* if(matches.size()>500){
-       matchesWithDist.erase(matchesWithDist.begin() + 500,matchesWithDist.end());
+       matchesWithDist2.erase(matchesWithDist2.begin() + 500,matchesWithDist2.end());
      }*/
 
     

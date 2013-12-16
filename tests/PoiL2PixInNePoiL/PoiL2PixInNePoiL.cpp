@@ -33,7 +33,7 @@ int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-int threshMatches=50;
+int threshMatches=200;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
@@ -482,6 +482,7 @@ int main(int argc, char **argv)
 
         }
     }
+    cout<<"\n nb of matches: "<<matchesWithDist.size()<<endl;
 
 
     //if we want to keep only some matches

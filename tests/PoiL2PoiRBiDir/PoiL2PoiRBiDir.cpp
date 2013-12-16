@@ -33,7 +33,7 @@ int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-float threshMatches=50;
+float threshMatches=0.2;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
