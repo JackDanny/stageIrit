@@ -33,7 +33,7 @@ int max_thresh = 100;
 
 ///value of the maximal matchingDistance we want. MatchingDistance can be consider like 
 ///the evaluation of similarity between two points.
-int threshMatches=200;
+float threshMatches=0.3;
 
 ///keypoints1 correspond to keypoints detected in the 1st image
 ///pointsx correspond to the keypoints detected in the 1st image keeped to be matched
@@ -476,6 +476,7 @@ int main(int argc, char **argv)
     //we keep only enough good matches with help from threshMatches
     for(int i=0;i<matchesWithDist.size();i++){
 	///when the quality of the match become unsatisfactory, we eliminate all others matches
+        cout<<"\n matcheswithdist "<<i<<" "<<matchesWithDist[i].distance;
  	if(matchesWithDist[i].distance>threshMatches){
 
 		matchesWithDist.erase(matchesWithDist.begin() + i,matchesWithDist.end());
@@ -521,8 +522,14 @@ int main(int argc, char **argv)
     ///interface is a recursive function allowing to use the trackbar
     interface(0, 0);
     
-    ///We wait the user press a key
-    waitKey(0);
+   
+
+    //while we don't have press the esc key
+    while(waitKey(0)%256 != 27);
+    
+
+
+
     return (0);
 }
 

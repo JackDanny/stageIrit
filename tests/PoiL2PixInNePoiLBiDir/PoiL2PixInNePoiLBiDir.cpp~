@@ -51,7 +51,7 @@ vector < KeyPoint > pointsy2,pointsx2;
 //distance of the neighborhood were we search pixels to matched, it's an EuclidianDistance
 //we use this value for the neighborhood were we search to match pointsx with pointy, but
 //so pointsy2 to pointsx2
-int EucDist = 15;
+int EucDist = 10;
 
 ///vector of the matches of one keypoint.
 vector < DMatch > matches;
