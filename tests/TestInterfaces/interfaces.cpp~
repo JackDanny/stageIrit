@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
     //cvCreateButton("button1",callbackButton,NULL,CV_CHECKBOX,1);
     //  char* nameb2 = "button2";
     //const char* b = "button2";
-    createButton(NULL,callbackButton);
+    cvCreateButton(NULL,callbackButton);
     /*cvCreateTrackbar( "track2", NULL, &value2, 255, NULL);
     cvCreateButton("button5",callbackButton1,NULL,CV_RADIOBOX,0);
     cvCreateButton("button6",callbackButton2,NULL,CV_RADIOBOX,1);
