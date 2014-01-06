@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 2.8)
-project( MPI )
-find_package( OpenCV REQUIRED )
-add_executable( mpi mpi.cpp )
-target_link_libraries( mpi ${OpenCV_LIBS} )
