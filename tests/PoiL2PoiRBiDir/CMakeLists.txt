@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( PoiL2PoiRBiDir )
+find_package( OpenCV REQUIRED )
+add_executable( PoiL2PoiRBiDir PoiL2PoiRBiDir.cpp )
+target_link_libraries( PoiL2PoiRBiDir ${OpenCV_LIBS} )

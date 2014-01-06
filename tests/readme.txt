@@ -1,3 +1,113 @@
+/****************************************************************************************/
+/*											*/
+/*Utilisation de la compilation automatique avec cmake					*/
+/*                                                                                     	*/
+/*Utilisation de la compilation avec g++						*/
+/*											*/
+/*exécution des fonctions								*/
+/*											*/
+/*erreurs frequentes									*/
+/*											*/
+/*Description de l'utilisation des détecteurs, descripteurs et apparieurs		*/
+/*											*/
+/*Description de l'utilisation de la fonction type2str					*/
+/*											*/
+/****************************************************************************************/
+
+/********************************/
+/*				*/
+/* compilation avec cmake	*/
+/*				*/
+/********************************/
+
+
+pour faciliter la compilation des programmes, j'ai créer un CMakeLists.txt 
+pour chacune des fonctions
+(PoiL2PoiR               , PoiL2PoiRBiDir  , PoiL2PoiRInNePoiL    , 
+ PoiL2PixIn9NPoiRInNePoiL, PoiL2PixInNePoiL, PoiL2PixInNePoiLBiDir)
+
+Si cmake est installé sur votre environnement, il vous suffit de vous placer dans 
+le répertoire du programme que vous voulez utiliser, 
+puis de réaliser les actions suivantes:
+
+1) cmake .
+
+2) make
+
+/********************************/
+/*				*/
+/* compilation avec g++		*/
+/*				*/
+/********************************/
+
+Une autre manière est de compiler directement avec g++.
+Pour cela, placer vous à l'endroit ou se trouve votre fichier que 
+vous voulez compiler, e.g monfichier.cpp 
+tapez ensuite la comande suivante:
+
+1) g++ nomprog.cpp  `pkg-config --cflags --libs opencv`
+
+/********************************/
+/*				*/
+/*  exécution des fonctions    	*/
+/*				*/
+/********************************/
+
+pour exécuter les fonctions
+
+tapez la ligne suivante:
+
+./nomExecutale pathimage1 pathimage2 detectorName descriptorName matcherName
+
+ou:
+
+-pathimage1: chemin de l'image 1
+
+-pathimage2: chemin de l'image 2
+
+-detectorName: nom du detecteur à choisir dans cette liste:
+ 
+ MSER
+ FAST
+ STAR
+ SIFT
+ SURF
+ ORB
+ HARRIS
+ GFTT
+ DENSE
+ SIMPLE BLOB
+
+-descriptorName: nom du descripteur à choisir dans cette liste:
+
+ SIFT
+ SURF
+ BRIEF
+ ORB
+
+-matcherName: nom de l'apparieur à choisir dans cette liste:
+ 
+ BruteForce
+ BruteForce-L1
+ BruteForce-Hamming
+ FlannBased
+
+/********************************/
+/*                          	*/
+/*     erreurs fréquentes	*/
+/*				*/
+/********************************/
+
+Pensez à régler les seuils threshMatches et EucDist si il est 
+présent (mettez threshMatches à 10000000 si il ne se passe rien)
+
+Changer l'apparieur pour voir si le probleme ne vient pas de là
+(conflit de type). Dans tous les cas il y en a au moins un qui fonctionne.
+
+vérifier que la taille des images est la même
+(ce problème est contournable pour certaines fonctions si on généralise
+Pil2PixN2PilImDif situé dans PoiL2PixInNePoiLBiDir)
+
 
 /****************************/
 /*                          */

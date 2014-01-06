@@ -1,1 +1,0 @@
-/home/veysseire/Documents/stageIrit/CMakeFiles/DisplayImage.dir
